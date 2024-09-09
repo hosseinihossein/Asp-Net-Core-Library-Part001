@@ -1,0 +1,143 @@
+@model SupportTicket_FormModel
+@{
+    string toWhom = User.Identity?.Name == "admin" ? "All" : "Admin";
+}
+<!---------------------------------------------------------------------->
+<style>
+    #form1d898ccb95204072a1885989d2a10412 {
+        width: 60%;
+        margin: auto;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 input[type=text],
+    #form1d898ccb95204072a1885989d2a10412 input[type=file],
+    #form1d898ccb95204072a1885989d2a10412 select,
+    #form1d898ccb95204072a1885989d2a10412 textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 textarea {
+        resize: vertical;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 label {
+        padding: 12px 12px 12px 0;
+        display: inline-block;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 input[type=submit] {
+        background-color: #04AA6D;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        float: right;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 input[type=submit]:hover {
+        background-color: #45a049;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 {
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 .col-25 {
+        float: left;
+        width: 25%;
+        margin-top: 6px;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 .col-75 {
+        float: left;
+        width: 75%;
+        margin-top: 6px;
+    }
+
+    @@media screen and (max-width: 800px) {
+        #form1d898ccb95204072a1885989d2a10412 {
+            width: 100%;
+        }
+    }
+
+    /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+    @@media screen and (max-width: 600px) {
+
+        #form1d898ccb95204072a1885989d2a10412 .col-25,
+        #form1d898ccb95204072a1885989d2a10412 .col-75,
+        #form1d898ccb95204072a1885989d2a10412 input[type=submit] {
+            width: 100%;
+            margin-top: 0;
+        }
+    }
+</style>
+<div id="form1d898ccb95204072a1885989d2a10412">
+    <h2 style="text-align: center;">Message to @toWhom</h2>
+    <form asp-action="SubmitNewMessage" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="All" style="color: red;"></div>
+        <div class="clearfix">
+            <div class="col-25">
+                <label>Username:</label>
+            </div>
+            <div class="col-75">
+                <input type="text" readonly disabled value="@User.Identity!.Name">
+            </div>
+        </div>
+        <div class="clearfix">
+            <div class="col-25">
+                <label asp-for="@Model.Subject">Subject:</label>
+            </div>
+            <div class="col-75">
+                <input type="text" asp-for="@Model.Subject" placeholder="subject..">
+            </div>
+        </div>
+        <div class="clearfix">
+            <div class="col-25">
+                <label asp-for="@Model.MessageText">Message:</label>
+            </div>
+            <div class="col-75">
+                <textarea asp-for="@Model.MessageText" placeholder="Write your message here.."
+                    style="height:200px"></textarea>
+            </div>
+        </div>
+        <div class="clearfix">
+            <div class="col-25">
+                <label asp-for="@Model.AttachedFile">File:</label>
+            </div>
+            <div class="col-75">
+                <input type="file" asp-for="@Model.AttachedFile">
+            </div>
+        </div>
+        @if (User.IsInRole("Admins"))
+        {
+            <div class="clearfix">
+                <div class="col-25">
+                    <label>To:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" asp-for="@Model.ToUsernames" readonly id="to-usernames">
+                </div>
+            </div>
+        }
+        else
+        {
+            <input type="hidden" readonly asp-for="@Model.ToUsernames" value="admin" id="to-usernames">
+        }
+        <br>
+        <div class="clearfix">
+            <input type="submit" value="Send">
+        </div>
+    </form>
+</div>
+
+<!--------------------------------------------------------------->
+@if (User.IsInRole("SupportTicket_Admins"))
+{
+    <partial name="ListOfUsers" model="@Model.UsersList" />
+}

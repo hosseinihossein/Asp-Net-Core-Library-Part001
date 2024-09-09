@@ -1,0 +1,227 @@
+@model Downloads_FormModel
+
+<!------------------------------------------------------------------->
+<style>
+    #form-container {
+        width: 80%;
+        margin: auto;
+        border: 1px solid gray;
+        padding: 50px;
+        border-radius: 5px;
+    }
+
+    #form-container form label {
+        margin: 10px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    #form-container form input,
+    #form-container form select {
+        margin: 10px;
+        font-size: 20px;
+        padding: 5px 10px;
+        min-width: 50%;
+    }
+
+    #form-container form textarea {
+        width: 60%;
+        margin: 40px 20% 20px 0;
+        font-size: 16px;
+        padding: 5px 10px;
+        float: right;
+    }
+
+    #form-container form button[type=submit] {
+        cursor: pointer;
+        font-size: 20px;
+        background-color: white;
+        padding: 10px 20px;
+        border: 1px solid gray;
+        border-radius: 5px;
+    }
+
+    #form-container form button[type=submit]:hover {
+        color: green;
+    }
+
+    @@media screen and (max-width:800px) {
+        #form-container {
+            width: 100%;
+            padding: 20px;
+        }
+
+        #form-container form textarea {
+            width: 80%;
+        }
+    }
+</style>
+<div id="form-container">
+    <form asp-action="SubmitNewFile" method="post" enctype="multipart/form-data"
+        onsubmit="AJAXSubmit(this);return false;">
+        <div asp-validation-summary="All" style="color: red;"></div>
+        <div>
+            <label>Large file:</label>
+            <input type="file" name="File" style="margin-right: 60px;" id="file-input">
+        </div>
+        <div>
+            <label>Another file (for example an image file):</label>
+            <input type="file" name="FileImage" style="margin-right: 10px;" id="file-image-input">
+        </div>
+        <div>
+            <label asp-for="Title">Title:</label>
+            <input type="text" asp-for="Title" placeholder="Title.." style="margin-right: 50px;">
+        </div>
+        <div>
+            <label asp-for="Category">Category:</label>
+            <select asp-for="Category" style="margin-right: 137px;">
+                <option value="Image">Image</option>
+                <option value="Video">Video</option>
+                <option value="Project">Project</option>
+                <option value="Software">Software</option>
+                <option value="Book">Book</option>
+            </select>
+        </div>
+        <div style="position: relative;">
+            <label asp-for="Description" style="float:left;">Description:</label>
+            <textarea asp-for="Description" rows="7" placeholder="Description.."></textarea>
+        </div>
+        <div style="width: fit-content;margin: 50px auto 20px;">
+            <button type="submit"><i class="fa-solid fa-file-arrow-up"></i> Upload</button>
+        </div>
+    </form>
+    <script>
+        async function AJAXSubmit(oFormElement) {
+            const formData = new FormData(oFormElement);
+            let request = new XMLHttpRequest();
+
+            request.upload.addEventListener("progress", e => {
+                let fileSize = document.getElementById("file-input").files[0].size;
+                let fileImageSize = document.getElementById("file-image-input").files[0]?.size || 0;
+                let wholeSize = fileSize + fileImageSize;
+
+                if (e.loaded <= wholeSize) {
+                    let percent = Math.round(e.loaded / wholeSize * 100);
+                    document.getElementById("myBar-loaded").style.width = percent + "%";
+                    document.getElementById("progress-percent").innerHTML = percent;
+                }
+                if (e.loaded == e.total) {
+                    document.getElementById("myBar-loaded").style.width = "100%";
+                    document.getElementById("progress-percent").innerHTML = "100";
+                }
+            });
+
+            request.onreadystatechange = () => {
+                if (request.readyState == XMLHttpRequest.DONE
+                    && request.status >= 200
+                    && request.status < 400) {
+                    window.location.href = request.responseText;
+                }
+            };
+
+            request.open("post", oFormElement.action);
+            request.setRequestHeader("RequestVerificationToken", getCookie('RequestVerificationToken'));
+            request.timeout = 30000;//30seconds
+            request.send(formData);
+
+            document.getElementById("modal1213276e57b2420cb55e23702f8e24da").style.display = "block";
+        }
+
+        function getCookie(name) {
+            let value = "; " + document.cookie;
+            let parts = value.split("; " + name + "=");
+            let myCookie;
+            if (parts.length == 2) {
+                myCookie = parts.pop().split(";").shift();
+            }
+
+            return myCookie;
+        }
+    </script>
+</div>
+<div id="modal1213276e57b2420cb55e23702f8e24da">
+    <style>
+        #modal1213276e57b2420cb55e23702f8e24da {
+            backdrop-filter: blur(5px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 1;
+            display: none;
+        }
+    </style>
+    <!--------------------------- spinner ---------------------------->
+    <style>
+        #m992017b8baba4208b747f40bd488dc69 {
+            width: fit-content;
+            margin: 35vh auto 0;
+            translate: 0 -50%;
+            text-align: center;
+        }
+
+        #m992017b8baba4208b747f40bd488dc69 .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin_m992017b8baba4208b747f40bd488dc69 2s linear infinite;
+            /* Safari */
+            animation: spin_m992017b8baba4208b747f40bd488dc69 2s linear infinite;
+        }
+
+        /* Safari */
+        @@-webkit-keyframes spin_m992017b8baba4208b747f40bd488dc69 {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes spin_m992017b8baba4208b747f40bd488dc69 {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <div id="m992017b8baba4208b747f40bd488dc69">
+        <div class="loader"></div>
+        Uploading ...
+    </div>
+
+    <!----------------------------- progress bar ----------------------------->
+    <style>
+        #m5e9e3470935f47c6a63b7765d950f2cf {
+            width: 60%;
+            margin: auto;
+        }
+
+        #m5e9e3470935f47c6a63b7765d950f2cf #myProgress {
+            width: 100%;
+            background-color: #ddd;
+        }
+
+        #m5e9e3470935f47c6a63b7765d950f2cf #myBar-loaded {
+            width: 1%;
+            height: 30px;
+            background-color: #04AA6D;
+        }
+    </style>
+
+    <div id="m5e9e3470935f47c6a63b7765d950f2cf">
+        <div id="myProgress">
+            <div id="myBar-loaded"></div>
+        </div>
+        <p style="text-align: center;"><span id="progress-percent">1</span> %</p>
+    </div>
+
+</div>

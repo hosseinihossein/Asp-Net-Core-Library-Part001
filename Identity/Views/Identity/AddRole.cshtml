@@ -1,0 +1,58 @@
+@model Identity_AddNewRoleModel
+
+<!--------------------------------------------------->
+<style>
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d {
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+        width: 80%;
+        margin: auto;
+    }
+
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d input[type=text],
+    select {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d input[type=submit]:hover {
+        background-color: #45a049;
+    }
+
+    @@mediascreen and (max-width:800px) {
+        #formf03f5a6366eb4ac2a68222d2dadc7e7d {
+            width: 100%;
+        }
+    }
+</style>
+<div id="formf03f5a6366eb4ac2a68222d2dadc7e7d">
+    <h1 style="text-align:center;">Adding New Role</h1>
+    <form asp-action="SubmitNewRole" method="post">
+        <div asp-validation-summary="All" style="color: red;"></div>
+
+        <label asp-for="RoleName">RoleName:</label>
+        <input type="text" asp-for="RoleName" placeholder="RoleName..">
+
+        <label asp-for="Description">Description:</label>
+        <input type="text" asp-for="Description" placeholder="Description..">
+
+        <input type="submit" value="Submit">
+    </form>
+</div>

@@ -1,0 +1,310 @@
+@model Review_ReviewModel
+@{
+    double starRatingAverage = Model.StarRatings.Count == 0 ? 0 : Model.StarRatings.Average<Review_StarRatingModel>(sr => sr.Rate);
+    double solidStar = Math.Floor(starRatingAverage);
+    int halfStar = solidStar == starRatingAverage ? 0 : 1;
+    int emptyStar = 5 - ((int)solidStar + halfStar);
+}
+<!------------------------------------------------------->
+<style>
+    #ratingStarsfcd2bfc7328c45bdaef7f8cd31384268 {
+        margin: 0px auto 0;
+        width: fit-content;
+        height: fit-content;
+        text-wrap: nowrap;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0);
+        overflow: hidden;
+        padding: 10px;
+        font-family: Helvetica, Arial, sans-serif;
+        /*float: left;*/
+        border: 1px solid gray;
+        border-radius: 5px;
+    }
+
+    #ratingStarsfcd2bfc7328c45bdaef7f8cd31384268 i {
+        font-size: 18px;
+    }
+
+    #ratingStarsfcd2bfc7328c45bdaef7f8cd31384268 p {
+        color: #222;
+        display: block;
+        margin: 10px auto 0;
+    }
+
+    #ratingStarsfcd2bfc7328c45bdaef7f8cd31384268 .reg-stars {
+        position: relative;
+        z-index: 1;
+        color: gray;
+    }
+
+    #ratingStarsfcd2bfc7328c45bdaef7f8cd31384268 button {
+        background-color: rgba(0, 0, 0, 0);
+        border: none;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+    }
+</style>
+<div id="ratingStarsfcd2bfc7328c45bdaef7f8cd31384268">
+    <div class="reg-stars">
+        @for (int i = 1; i <= solidStar; i++)
+        {
+            <button 
+            @if(User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                @:onclick="sendRatingForReview(@i)" 
+            }
+            else
+            {
+                @:onclick="pleaseLogin_67e5e6faae944f1abacd0a92c4ab1219()"
+            }
+            style="color: #555;"><i class="fa-solid fa-star"></i>
+            </button>
+        }
+        @if (halfStar == 1)
+        {
+            <button 
+            @if(User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                @:onclick="sendRatingForReview(@(solidStar + 1))" 
+            }
+            else
+            {
+                @:onclick="pleaseLogin_67e5e6faae944f1abacd0a92c4ab1219()"
+            }
+            style="color: #555;"><i class="fa-regular fa-star-half-stroke"></i>
+            </button>
+        }
+        @for (int i = 1; i <= emptyStar; i++)
+        {
+            <button 
+            @if(User.Identity != null && User.Identity.IsAuthenticated)
+            {
+            @:onclick="sendRatingForReview(@(solidStar + halfStar + i))" 
+            }
+            else
+            {
+                @:onclick="pleaseLogin_67e5e6faae944f1abacd0a92c4ab1219()"
+            }
+            style="color: #555;"><i class="fa-regular fa-star"></i>
+            </button>
+        }
+    </div>
+    <div>
+        <p id="rateValue">rate: @starRatingAverage.ToString("F")</p>
+        <p onclick="getStarRatingListForReview('@Model.ReviewGuid')">
+            <span id="numberOfVotes">@Model.StarRatings.Count</span> votes
+        </p>
+        <p style="display: none;">you voted: <span id="yourVote"></span></p>
+    </div>
+</div>
+<script>
+    let mainElement_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268 = document.getElementById("ratingStarsfcd2bfc7328c45bdaef7f8cd31384268");
+    let stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268 = mainElement_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268.getElementsByTagName("I");
+
+    for (let j = 0; j < stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268.length; j++) {
+        stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268[j].addEventListener("mouseover", (event) => {
+            for (let i = 0; i <= j; i++) {
+                stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268[i].style.color = "gold";
+            }
+        });
+    }
+
+    for (let j = 0; j < stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268.length; j++) {
+        stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268[j].addEventListener("mouseleave", (event) => {
+            for (let i = 0; i < stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268.length; i++) {
+                stars_ratingStarsfcd2bfc7328c45bdaef7f8cd31384268[i].style.color = "#555";
+            }
+        });
+    }
+
+    function sendRatingForReview(rate) {
+        fetch(`/Review/StarRating?reviewGuid=@(Model.ReviewGuid)&rating=${rate}`, {
+            credentials: "same-origin"
+        });
+        let yourVoteSpan = document.getElementById("yourVote");
+        yourVoteSpan.innerHTML = rate;
+        yourVoteSpan.parentElement.style.display = "block";
+        let numberOfVotes = document.getElementById("numberOfVotes");
+        numberOfVotes.innerHTML = Number(numberOfVotes.innerHTML) + 1;
+    }
+
+    function pleaseLogin_67e5e6faae944f1abacd0a92c4ab1219() {
+        alert("Please login");
+    }
+
+    function getStarRatingListForReview(reviewGuid) {
+        fetch(`/Review/GetStarRatingListForReview?reviewGuid=${reviewGuid}`, {
+            credentials: "same-origin"
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then(usernameRates => {
+            let listItems = "";
+            for (let usernameRate of usernameRates) {
+                listItems +=
+                    `<li><div class="chip">
+                <a href="/Identity/Profile/${usernameRate.username}">
+                    <img src="/Identity/UserImage?username=${usernameRate.username}" alt="User Image Profile">
+                    ${usernameRate.username}
+                </a><span style="font-size:14px;">,Rate=${usernameRate.rate}</span></div></li>`;
+            }
+            let list = `<h3>Star Ratings:</h3><ul>${listItems}</ul>`;
+            document.getElementById("list5e3f1118e8504e5ab6b1c7099f2a6604").innerHTML = list;
+            showModal_0f1058e4335440e691595301c2ba2011();
+        });
+    }
+</script>
+
+<!------------------------------------- modal ---------------------------------------->
+<div id="modal0cda0990e3aa48a8bac5f0e82a7f0130">
+    <style>
+        /* Add padding and center-align text to the container */
+        #modal0cda0990e3aa48a8bac5f0e82a7f0130 .container {
+            padding: 16px;
+            text-align: center;
+        }
+
+        /* The Modal (background) */
+        #modal0cda0990e3aa48a8bac5f0e82a7f0130 .modal {
+            display: block;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 2;
+            /* Sit on top */
+            left: 50%;
+            top: 50%;
+            width: 0;
+            /* Full width */
+            height: 0;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgba(60, 69, 88, 0.7);
+            padding-top: 0px;
+            transition: all 0.3s;
+        }
+
+        #modal0cda0990e3aa48a8bac5f0e82a7f0130 .modal.open {
+            /*display: block;*/
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Modal Content/Box */
+        #modal0cda0990e3aa48a8bac5f0e82a7f0130 .modal-content {
+            background-color: rgba(255, 255, 255, 1);
+            margin: 50px auto;
+            /*border: 1px solid #888;*/
+            width: fit-content;
+        }
+
+        /* The Modal Close Button (x) */
+        #modal0cda0990e3aa48a8bac5f0e82a7f0130 .close {
+            position: relative;
+            float: right;
+            right: 15px;
+            /*top: 15px;*/
+            font-size: 40px;
+            font-weight: bold;
+            color: #696969;
+            cursor: pointer;
+        }
+
+        #modal0cda0990e3aa48a8bac5f0e82a7f0130 .close:hover,
+        #modal0cda0990e3aa48a8bac5f0e82a7f0130 .close:focus {
+            color: red;
+        }
+    </style>
+
+    <div id="modal-background" class="modal">
+        <div class="modal-content" action="">
+            <span onclick="this.parentElement.parentElement.classList.remove('open');" class="close"
+                title="Close Modal">&times;</span>
+            <div class="container">
+                <style>
+                    #list5e3f1118e8504e5ab6b1c7099f2a6604 .modal-list {
+                        display: none;
+                    }
+
+                    #list5e3f1118e8504e5ab6b1c7099f2a6604 .modal-list.show {
+                        display: block;
+                    }
+
+                    #list5e3f1118e8504e5ab6b1c7099f2a6604 ul {
+                        list-style-type: none;
+                        /* Remove bullets */
+                        padding: 0;
+                        /* Remove padding */
+                        margin: 0 auto;
+                        /* Remove margins */
+                        /*max-width: 320px;*/
+                        max-height: calc(90vh - 20px);
+                        overflow-y: auto;
+                    }
+
+                    #list5e3f1118e8504e5ab6b1c7099f2a6604 ul li {
+                        border: 1px solid #ddd;
+                        /* Add a thin border to each list item */
+                        margin-top: -1px;
+                        /* Prevent double borders */
+                        background-color: #f6f6f6;
+                        /* Add a grey background color */
+                        padding: 12px;
+                        /* Add some padding */
+                        text-align: start;
+                    }
+
+                    /*********************************/
+                    #list5e3f1118e8504e5ab6b1c7099f2a6604 .chip {
+                        display: inline-block;
+                        padding: 0 25px;
+                        height: 50px;
+                        font-size: 16px;
+                        line-height: 50px;
+                        border-radius: 25px;
+                        background-color: #f1f1f1;
+                    }
+
+                    #list5e3f1118e8504e5ab6b1c7099f2a6604 .chip a {
+                        text-decoration: none;
+                        color: rgb(3, 3, 3);
+                    }
+
+                    #list5e3f1118e8504e5ab6b1c7099f2a6604 .chip img {
+                        float: left;
+                        margin: 0 10px 0 -25px;
+                        height: 50px;
+                        width: 50px;
+                        border-radius: 50%;
+                    }
+                </style>
+                <!--*********************************** Lists ***********************************-->
+                <div id="list5e3f1118e8504e5ab6b1c7099f2a6604">
+
+                </div>
+                <!--*************************************************************************************-->
+            </div>
+        </div>
+    </div>
+    <script>
+        // When the user clicks anywhere outside of the modal, close it
+        window.addEventListener("click", (event) => {
+            // Get the modal
+            let modal = document.getElementById('modal0cda0990e3aa48a8bac5f0e82a7f0130').querySelector("#modal-background");
+            if (event.target == modal) {
+                modal.classList.remove('open');
+                //hideAllModalList();
+            }
+        });
+        function showModal_0f1058e4335440e691595301c2ba2011() {
+            document.getElementById("modal0cda0990e3aa48a8bac5f0e82a7f0130")
+                .querySelector('#modal-background').classList.add('open');
+        }
+    </script>
+</div>

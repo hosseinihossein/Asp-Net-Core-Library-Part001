@@ -1,0 +1,228 @@
+@model Review_ReviewModel
+
+<!--------------------------------------------------------->
+
+<style>
+    #formc66737b9ae1f4b839a66ceb79b73ad87 {
+        width: 60%;
+        height: 100%;
+        float: left;
+    }
+
+    #formc66737b9ae1f4b839a66ceb79b73ad87 input,
+    #formc66737b9ae1f4b839a66ceb79b73ad87 textarea {
+        font-size: 16px;
+        float: left;
+        padding: 8px 10px;
+        border: 1px solid gray;
+        border-radius: 5px;
+    }
+
+    #formc66737b9ae1f4b839a66ceb79b73ad87 input[type=text],
+    #formc66737b9ae1f4b839a66ceb79b73ad87 textarea {
+        width: 100%;
+        height: calc(70%);
+    }
+
+    #formc66737b9ae1f4b839a66ceb79b73ad87 input[type=submit] {
+        width: 100%;
+        height: calc(30% - 5px);
+        margin: 5px auto 0;
+        cursor: pointer;
+    }
+</style>
+<form id="formc66737b9ae1f4b839a66ceb79b73ad87" onsubmit="sendCommentForReview(this);return false;"
+    asp-controller="Reveiw" asp-action="SubmitCommentForReview">
+    <input name="reviewGuid" hidden value="@Model.ReviewGuid" />
+    <textarea name="commentText" id="comment-textarea" placeholder="write your comment here.."></textarea>
+    <input type="submit" value="Send">
+</form>
+<script>
+    async function sendCommentForReview(element) {
+        if ("@(User.Identity == null || !User.Identity.IsAuthenticated)" == "True") {
+            pleaseLogin_71210a7b9fa04144b078021c44bad7cb();
+            return;
+        }
+
+        let textareaElement = element.querySelector("#comment-textarea");//.previousElementSibling;
+        let commentText = textareaElement.value;
+        if (commentText.trim() == "") return;
+        //let submitCommentUrl = new URL(element.action); doesn't work do to cross-origin restrict
+        //document.getElementById("submitCommentUrlForReview").href;
+        //console.log("submitCommentUrl: " + submitCommentUrl);
+
+        let newCommentElement = document.createElement("div");
+        newCommentElement.classList.add("container");
+        newCommentElement.innerHTML =
+            `<h4>@User.Identity!.Name:</h4>
+        <p>${commentText}</p>
+        <span class="commentDateSpan">${new Date(Date.now()).toLocaleDateString()}</span>
+        <div class="comment-btn-box clearfix">
+        <button onclick="showFormForComment(this)" class="reply-btn">Reply</button>
+        <!------ like heart ------>
+        <div style="margin-right: 5px;">
+            <button style="color: gray;" onclick="likeComment(this, '')">
+                    <a style="display: none;" id="likeLink"></a>
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+                <button style="color: red;display: none;"
+                    onclick="unlikeComment(this, '')">
+                    <a style="display: none;" id="unlikeLink"></a>
+                    <i class="fa-solid fa-heart"></i>
+                </button>
+
+            <span onclick="getLikesListForComment('')" class="counterSpanInComment"
+                id="likeCounterHeart">0</span>
+        </div>
+        <!------ like thumb up ------>
+        <div style="margin-right: 5px;">
+            <button id="thumb-up-like-btn" style="color: gray;" onclick="thumbsUpComment(this, '')">
+                    <a style="display: none;" id="likeLinkThumbUp"></a>
+                    <i class="fa-regular fa-thumbs-up"></i>
+                </button>
+                <button id="thumb-up-unlike-btn" style="color: skyblue;display: none;"
+                    onclick="unThumbsUpComment(this, '')">
+                    <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                    <i class="fa-solid fa-thumbs-up"></i>
+                </button>
+
+            <span onclick="getThumbsUpListForComment('')"
+                class="counterSpanInComment"
+                id="likeCounterThumbUp">0</span>
+        </div>
+        <!------ dislike thumb down ------>
+        <div style="margin-right: 5px;">
+            <button id="thumb-down-dislike-btn" style="color: gray;" onclick="thumbsDownComment(this, '')">
+                    <a style="display: none;" id="dislikeLinkThumbUp"></a>
+                    <i class="fa-regular fa-thumbs-down"></i>
+                </button>
+                <button id="thumb-down-unDislike-btn" style="color: skyblue;display: none;"
+                    onclick="unThumbsDownComment(this, '')">
+                    <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                    <i class="fa-solid fa-thumbs-down"></i>
+                </button>
+
+            <span onclick="getThumbsDownListForComment('')"
+                class="counterSpanInComment"
+                id="dislikeCounterThumbDown">0</span>
+        </div>
+        <a asp-controller="Review" asp-action="DeleteComment"
+            asp-route-commentGuid="" style="color: red;margin-right: 20px;"><i
+                class="fa-solid fa-trash-can"></i>
+        </a>
+        </div>
+        <div class="form-div clearfix">
+            <form asp-action="SubmitCommentReply" method="post">
+                <textarea name="" id="" placeholder="Reply.." style="width:50%;max-width:80%;height:50px;padding:10px;float:left;"></textarea>
+                <input
+                    onclick="sendCommentForComment(this, '', '@User.Identity.Name')"
+                    value="Send" type="button" style="text-align: center;width: fit-content;
+                    cursor: pointer;padding:5px 10px;position:absolute;bottom:10px;margin-left:5px;">
+            </form>
+        </div>`;
+
+        let commentsTitleElement = document.getElementById("firstCommentAfter");
+        commentsTitleElement.after(newCommentElement);
+
+        textareaElement.value = "";
+        let verificationTokenInput = element.querySelector("input[name='__RequestVerificationToken']");
+        let formData = new FormData(element);//formData can't take textarea.value
+        formData.set("commentText", commentText);//commentext needs to be set
+        try {
+            fetch(`./Review/SubmitCommentForReview`, {
+                credentials: "same-origin",
+                method: "POST",
+                body: formData
+            }).then(resp => {
+                if (resp.ok) {
+                    let replyCommentGuid = resp.text();
+                    //console.log(text);
+                    newCommentElement.innerHTML =
+                        `<h4>@User.Identity!.Name:</h4>
+                        <p>${commentText}</p>
+                        <span class="commentDateSpan">${new Date(Date.now()).toLocaleDateString()}</span>
+                        <div class="comment-btn-box clearfix">
+                            <button onclick="showFormForComment(this)" class="reply-btn">Reply</button>
+                            <!------ like heart ------>
+                            <div style="margin-right: 5px;">
+                                <button style="color: gray;" onclick="likeComment(this, '${replyCommentGuid}')">
+                                        <a style="display: none;" id="likeLink"></a>
+                                        <i class="fa-regular fa-heart"></i>
+                                    </button>
+                                    <button style="color: red;display: none;"
+                                        onclick="unlikeComment(this, '${replyCommentGuid}')">
+                                        <a style="display: none;" id="unlikeLink"></a>
+                                        <i class="fa-solid fa-heart"></i>
+                                    </button>
+
+                                <span onclick="getLikesListForComment('${replyCommentGuid}')" class="counterSpanInComment"
+                                    id="likeCounterHeart">0</span>
+                            </div>
+                            <!------ like thumb up ------>
+                            <div style="margin-right: 5px;">
+                                <button id="thumb-up-like-btn" style="color: gray;" onclick="thumbsUpComment(this, '${replyCommentGuid}')">
+                                        <a style="display: none;" id="likeLinkThumbUp"></a>
+                                        <i class="fa-regular fa-thumbs-up"></i>
+                                    </button>
+                                    <button id="thumb-up-unlike-btn" style="color: skyblue;display: none;"
+                                        onclick="unThumbsUpComment(this, '${replyCommentGuid}')">
+                                        <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                                        <i class="fa-solid fa-thumbs-up"></i>
+                                    </button>
+
+                                <span onclick="getThumbsUpListForComment('${replyCommentGuid}')"
+                                    class="counterSpanInComment"
+                                    id="likeCounterThumbUp">0</span>
+                            </div>
+                            <!------ dislike thumb down ------>
+                            <div style="margin-right: 5px;">
+                                <button id="thumb-down-dislike-btn" style="color: gray;" onclick="thumbsDownComment(this, '${replyCommentGuid}')">
+                                        <a style="display: none;" id="dislikeLinkThumbUp"></a>
+                                        <i class="fa-regular fa-thumbs-down"></i>
+                                    </button>
+                                    <button id="thumb-down-unDislike-btn" style="color: skyblue;display: none;"
+                                        onclick="unThumbsDownComment(this, '${replyCommentGuid}')">
+                                        <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                                        <i class="fa-solid fa-thumbs-down"></i>
+                                    </button>
+
+                                <span onclick="getThumbsDownListForComment('${replyCommentGuid}')"
+                                    class="counterSpanInComment"
+                                    id="dislikeCounterThumbDown">0</span>
+                            </div>
+                            <a asp-controller="Review" asp-action="DeleteComment"
+                                asp-route-commentGuid="${replyCommentGuid}" style="color: red;margin-right: 20px;"><i
+                                    class="fa-solid fa-trash-can"></i>
+                            </a>
+                            <span id="deliveryConfirmed"
+                                style="float: left;display: none;color: lawngreen;font-size: 12px;margin: 0;padding: 0;">
+                                delivered<i class="fa-solid fa-check"></i>
+                            </span>
+                        </div>
+                        <div class="form-div clearfix">
+                            <form asp-action="SubmitCommentReply" method="post">
+                                <textarea name="" id="" placeholder="Reply.." style="width:50%;max-width:80%;height:50px;padding:10px;float:left;"></textarea>
+                                <input
+                                    onclick="sendCommentForComment(this, '${replyCommentGuid}', '@User.Identity.Name')"
+                                    value="Send" type="button" style="text-align: center;width: fit-content;
+                                    cursor: pointer;padding:5px 10px;position:absolute;bottom:10px;margin-left:5px;">
+                            </form>
+                        </div>`;
+                    newCommentElement.querySelector("#deliveryConfirmed").style.display = "inline";
+                }
+                /*else {
+                    console.log("resp.type: " + resp.type);
+                    console.log("resp.status: " + resp.status);
+                    //console.log("resp.json(): " + resp.json());
+                }*/
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    function pleaseLogin_71210a7b9fa04144b078021c44bad7cb() {
+        alert("Please login");
+    }
+</script>

@@ -1,0 +1,529 @@
+@model List<Identity_RolesListModel>
+
+<!-------------------------------------------------->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer">
+
+<style>
+    /* Customize the label (the container) */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .container {
+        display: block;
+        position: relative;
+        padding-left: 35px;
+        /*margin-bottom: 12px;*/
+        cursor: pointer;
+        font-size: 22px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    /* Hide the browser's default checkbox */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    /* Create a custom checkbox */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .checkmark {
+        position: absolute;
+        top: -12px;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        border-radius: 10px;
+        border: 1px solid lightgray;
+    }
+
+    /* On mouse-over, add a grey background color */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .container:hover input~.checkmark {
+        background-color: #ccc;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .container input:checked~.checkmark {
+        background-color: #008cff;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    /* Show the checkmark when checked */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .container input:checked~.checkmark:after {
+        display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    #table69cbcffed58f432f8a574e34d072ed73 .formbd815e99e0f2479ab098c05b6dfc81f7 .container .checkmark:after {
+        left: 8px;
+        top: 4px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    /****************************************************************************************/
+    #table69cbcffed58f432f8a574e34d072ed73 {
+        width: 90%;
+        background-color: rgba(250, 250, 250, 1);
+        margin: 50px auto;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 table {
+        border: none;
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr {
+        border-radius: 20px;
+        transition: box-shadow 0.1s;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr:not(:first-child):hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        background-color: white;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr:first-child {
+        background-color: rgb(236, 236, 236);
+        border: none;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr th:first-child,
+    #table69cbcffed58f432f8a574e34d072ed73 tr td:first-child {
+        /*border-radius: 0 15px 15px 0;*/
+        border-radius: 15px 0 0 15px;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr th:last-child,
+    #table69cbcffed58f432f8a574e34d072ed73 tr td:last-child {
+        /*border-radius: 15px 0 0 15px;*/
+        border-radius: 0 15px 15px 0;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 th,
+    #table69cbcffed58f432f8a574e34d072ed73 td {
+        border: none;
+        margin: 0;
+        padding: 20px 10px;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 th {
+        padding: 10px;
+        color: gray;
+        font-weight: normal;
+    }
+
+    /*#table69cbcffed58f432f8a574e34d072ed73 td {
+    }*/
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td.bold {
+        font-weight: bold;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td span {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 10px;
+    }
+
+    /******************* color ****************/
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td.gray {
+        color: gray;
+        font-size: 12px;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td span.red {
+        color: rgb(221, 0, 0);
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td span.green {
+        color: green;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td span.blue {
+        color: blue;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td span.bg-red {
+        background-color: rgba(255, 0, 0, 0.2);
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td span.bg-green {
+        background-color: rgba(124, 252, 0, 0.2);
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td span.bg-blue {
+        background-color: rgba(135, 206, 235, 0.2);
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 table a {
+        text-decoration: none;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td:last-child a,
+    #table69cbcffed58f432f8a574e34d072ed73 tr td:last-child button {
+        padding: 10px 20px;
+        color: blue;
+        font-size: 12px;
+        background-color: rgba(0, 0, 0, 0);
+        border-radius: 20px;
+        border: 1px solid lightgray;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 tr td:last-child a:hover,
+    #table69cbcffed58f432f8a574e34d072ed73 tr td:last-child button:hover {
+        background-color: rgba(135, 206, 235, 0.2);
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 th span.triangle {
+        font-size: 22px;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 th span.triangle.down {
+        font-size: 20px;
+        position: relative;
+        left: -15px;
+        /*right: 0px;*/
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 th.clickable {
+        cursor: pointer;
+        position: relative;
+    }
+
+    #table69cbcffed58f432f8a574e34d072ed73 th.clickable:hover {
+        color: black;
+    }
+</style>
+<div id="table69cbcffed58f432f8a574e34d072ed73">
+    <!----------------------------------------- add user and search ----------------------------------------->
+    <div>
+        <style>
+            .addNewUser-btn {
+                font-size: 24px;
+                text-decoration: none;
+                border: 1px solid gray;
+                padding: 5px 10px;
+                border-radius: 5px;
+                display: block;
+                width: fit-content;
+                margin: 0 10px;
+                float: right;
+            }
+
+            .addNewUser-btn:hover {
+                color: lawngreen;
+            }
+
+            #hr5012ee2da3a449a78539e32f813e132c {
+                margin: 30px 0 50px;
+                overflow: visible;
+                height: 1px;
+            }
+
+            #hr5012ee2da3a449a78539e32f813e132c::after {
+                content: "Roles List";
+                position: relative;
+                top: -15px;
+                right: -50%;
+                transform: translateX(-50%);
+                font-weight: bold;
+                border: 1px solid gray;
+                background-color: white;
+                padding: 5px;
+                display: block;
+                width: fit-content;
+                text-align: center;
+            }
+        </style>
+        <div class="clearfix">
+            <a asp-action="AddRole" class="addNewUser-btn">
+                <i class="fa-solid fa-square-plus"></i>
+                <span style="font-size: 16px;font-weight: bold;">Add New Role</span>
+            </a>
+
+            <!--p style="margin: 10px;display: inline-block;margin-right: 300px;">Number of Users:
+                <span id="usersCount"></span>
+            </p-->
+        </div>
+
+        <hr id="hr5012ee2da3a449a78539e32f813e132c">
+    </div>
+
+    <!---------------------------------- users list -------------------------------------->
+    <table id="filterTable9bac668ddd8841f590416eafec7f6f80">
+        <tbody>
+            <tr>
+                <th class="clickable" onclick="sortTable_Script_21a191e39d5d4e93afa2a2d0a230a902(this, 0)">
+                    Roles
+                    <span class="triangle up">▴</span>
+                    <span class="triangle down">▾</span>
+                </th>
+                <th>Description</th>
+                <th class="clickable" onclick="sortTable_Script_823253cc22454a5db45bb30b06747555(this, 2)">
+                    Number of Members
+                    <span class="triangle up">▴</span>
+                    <span class="triangle down">▾</span>
+                </th>
+                <th>Actions</th>
+            </tr>
+            @foreach (Identity_RolesListModel roleListModel in Model)
+            {
+                <tr class="filterTR">
+                    <td class="bold">@roleListModel.Role</td>
+                    <td>@roleListModel.RoleDescription</td>
+                    <td class="bold">@roleListModel.NumberOfMembers</td>
+                    <td>
+                        <a asp-action="EditRole" asp-route-roleName="@roleListModel.Role">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>/*
+Script_823253cc22454a5db45bb30b06747555
+
+sorts table by number by click on table head
+*/
+    function sortTable_Script_823253cc22454a5db45bb30b06747555(element, n) {
+        let upTriangle = element.getElementsByClassName("up")[0];
+        let downTriangle = element.getElementsByClassName("down")[0];
+
+        let rows, switching, i, tableData, nextTableData, shouldSwitch, dir, switchcount = 0;
+        let table = element.parentElement.parentElement;
+        switching = true;
+        //Set the sorting direction to ascending:
+        dir = "asc";
+        upTriangle.style.visibility = "visible";
+        downTriangle.style.visibility = "hidden";
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1); i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare,
+                one from current row and one from the next:*/
+                tableData = rows[i].getElementsByTagName("TD")[n];
+                nextTableData = rows[i + 1].getElementsByTagName("TD")[n];
+                /*check if the two rows should switch place,
+                based on the direction, asc or desc:*/
+                if (dir == "asc") {
+                    if (Number(tableData.innerText) > Number(nextTableData.innerText)) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (Number(tableData.innerText) < Number(nextTableData.innerText)) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch
+                and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                //Each time a switch is done, increase this count by 1:
+                switchcount++;
+            } else {
+                /*If no switching has been done AND the direction is "asc",
+                set the direction to "desc" and run the while loop again.*/
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                    upTriangle.style.visibility = "hidden";
+                    downTriangle.style.visibility = "visible";
+                }
+            }
+        }
+
+    }
+</script>
+
+<script>
+    /*Script_7f93fc1a6ee040718d57e78df9d58200
+    sorts table by date by click on table head*/
+
+    function sortTable_Script_d321834585ae45f0b2e5190c2f7b476b(element, n) {
+        let upTriangle = element.getElementsByClassName("up")[0];
+        let downTriangle = element.getElementsByClassName("down")[0];
+
+        let rows, switching, i, tableData, nextTableData, shouldSwitch, dir, switchcount = 0;
+        let table = element.parentElement.parentElement;
+        switching = true;
+        //Set the sorting direction to ascending:
+        dir = "asc";
+        upTriangle.style.visibility = "visible";
+        downTriangle.style.visibility = "hidden";
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1); i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare,
+                one from current row and one from the next:*/
+                tableData = rows[i].getElementsByTagName("TD")[n];
+                nextTableData = rows[i + 1].getElementsByTagName("TD")[n];
+                /*check if the two rows should switch place,
+                based on the direction, asc or desc:*/
+                if (dir == "asc") {
+                    if (Date.parse(tableData.innerText) > Date.parse(nextTableData.innerText)) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (Date.parse(tableData.innerText) < Date.parse(nextTableData.innerText)) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch
+                and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                //Each time a switch is done, increase this count by 1:
+                switchcount++;
+            } else {
+                /*If no switching has been done AND the direction is "asc",
+                set the direction to "desc" and run the while loop again.*/
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                    upTriangle.style.visibility = "hidden";
+                    downTriangle.style.visibility = "visible";
+                }
+            }
+        }
+
+    }
+</script>
+
+<script>
+    /*Script_7f93fc1a6ee040718d57e78df9d58200
+    sorts table by name by click on table head*/
+
+    function sortTable_Script_21a191e39d5d4e93afa2a2d0a230a902(element, n) {
+        let upTriangle = element.getElementsByClassName("up")[0];
+        let downTriangle = element.getElementsByClassName("down")[0];
+
+        let rows, switching, i, tableData, nextTableData, shouldSwitch, dir, switchcount = 0;
+        let table = element.parentElement.parentElement;
+        switching = true;
+        //Set the sorting direction to ascending:
+        dir = "asc";
+        upTriangle.style.visibility = "visible";
+        downTriangle.style.visibility = "hidden";
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1); i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare,
+                one from current row and one from the next:*/
+                tableData = rows[i].getElementsByTagName("TD")[n];
+                nextTableData = rows[i + 1].getElementsByTagName("TD")[n];
+                /*check if the two rows should switch place,
+                based on the direction, asc or desc:*/
+                if (dir == "asc") {
+                    if (tableData.innerText > nextTableData.innerText) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (tableData.innerText < nextTableData.innerText) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch
+                and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                //Each time a switch is done, increase this count by 1:
+                switchcount++;
+            } else {
+                /*If no switching has been done AND the direction is "asc",
+                set the direction to "desc" and run the while loop again.*/
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                    upTriangle.style.visibility = "hidden";
+                    downTriangle.style.visibility = "visible";
+                }
+            }
+        }
+
+    }
+</script>
+
+<script>
+    function toggleAllCkeckboxes_table69cbcffed58f432f8a574e34d072ed73(element) {
+        let mainTable = document.getElementById("table69cbcffed58f432f8a574e34d072ed73");
+        let allRows = mainTable.getElementsByTagName("TR");
+        for (let i = 1; i < allRows.length; i++) {
+            if (element.checked) {
+                allRows[i].getElementsByTagName("TD")[0].getElementsByTagName("input")[0].checked = true;
+            }
+            else {
+                allRows[i].getElementsByTagName("TD")[0].getElementsByTagName("input")[0].checked = false;
+            }
+        }
+    }
+</script>
+
+<script>
+    let userCountSpan = document.getElementById("usersCount");
+    let mainTable = document.getElementById("filterTable9bac668ddd8841f590416eafec7f6f80");
+    userCountSpan.innerHTML = mainTable.getElementsByTagName("TR").length - 1;
+</script>

@@ -1,0 +1,65 @@
+@model Identity_AddNewUserModel
+
+<!--------------------------------------------------------------------->
+
+<style>
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d {
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+        width: 80%;
+        margin: auto;
+    }
+
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d input[type=text],
+    select {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #formf03f5a6366eb4ac2a68222d2dadc7e7d input[type=submit]:hover {
+        background-color: #45a049;
+    }
+
+    @@mediascreen and (max-width:800px) {
+        #formf03f5a6366eb4ac2a68222d2dadc7e7d {
+            width: 100%;
+        }
+    }
+</style>
+<div id="formf03f5a6366eb4ac2a68222d2dadc7e7d">
+    <h1 style="text-align:center;">Adding New User</h1>
+    <form asp-action="SubmitNewUser" method="post">
+        <div asp-validation-summary="All" style="color: red;"></div>
+
+        <label asp-for="Username">Username:</label>
+        <input type="text" asp-for="Username" placeholder="Username..">
+
+        <label asp-for="Email">Email:</label>
+        <input type="text" asp-for="Email" placeholder="Email..">
+
+        <label asp-for="Password">Password:</label>
+        <input type="text" asp-for="Password" placeholder="Password..">
+
+        <label asp-for="RepeatPassword">Repeat Password:</label>
+        <input type="text" asp-for="RepeatPassword" placeholder="Repeat Password..">
+
+        <input type="submit" value="Submit">
+    </form>
+</div>

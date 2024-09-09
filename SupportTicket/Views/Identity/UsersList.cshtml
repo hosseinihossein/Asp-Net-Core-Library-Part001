@@ -1,0 +1,63 @@
+@model List<Identity_UserAndRolesModel>
+
+<!----------------------------------------- add user and search ----------------------------------------->
+<div>
+    <style>
+        .top-buttons {
+            font-size: 24px;
+            text-decoration: none;
+            border: 1px solid gray;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: block;
+            width: fit-content;
+            margin: 10px;
+            float: right;
+        }
+
+        .top-buttons:hover {
+            color: lawngreen;
+        }
+
+        #backup-btn {
+            float: left;
+        }
+
+        #hr5012ee2da3a449a78539e32f813e132c {
+            margin: 30px 0 50px;
+            overflow: visible;
+            height: 1px;
+        }
+
+        #hr5012ee2da3a449a78539e32f813e132c::after {
+            content: "Users List";
+            position: relative;
+            top: -15px;
+            right: -50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            border: 1px solid gray;
+            background-color: white;
+            padding: 5px;
+            display: block;
+            width: fit-content;
+            text-align: center;
+        }
+    </style>
+    <div class="clearfix">
+        <a asp-action="AddUser" class="top-buttons">
+            <i class="fa-solid fa-square-plus"></i>
+            <span style="font-size: 16px;font-weight: bold;">Add New User</span>
+        </a>
+        <a asp-action="Backup" style="float: left;" class="top-buttons">
+            <i class="fa-solid fa-database"></i>
+            <span style="font-size: 16px;font-weight: bold;">Backup Identities</span>
+        </a>
+    </div>
+
+    <hr id="hr5012ee2da3a449a78539e32f813e132c">
+</div>
+
+<!-------------------------------------------------->
+
+<partial name="ListOfUsers" model="@Model" />

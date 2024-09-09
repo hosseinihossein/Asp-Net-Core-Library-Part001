@@ -1,0 +1,182 @@
+<!----------------------------------------------------------------------->
+<style>
+    #table490f8636502541beb2ad5551784cd3d3 {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        margin: auto;
+    }
+
+    #table490f8636502541beb2ad5551784cd3d3 td,
+    #table490f8636502541beb2ad5551784cd3d3 th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    #table490f8636502541beb2ad5551784cd3d3 tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    #table490f8636502541beb2ad5551784cd3d3 tr:hover {
+        background-color: #ddd;
+    }
+
+    #table490f8636502541beb2ad5551784cd3d3 th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #04AA6D;
+        color: white;
+    }
+
+    /*#table490f8636502541beb2ad5551784cd3d3 td button {
+        padding: 10px 20px;
+        color: blue;
+        font-size: 12px;
+        background-color: rgba(0, 0, 0, 0);
+        border-radius: 20px;
+        border: 1px solid blue;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    #table490f8636502541beb2ad5551784cd3d3 td button:hover {
+        background-color: rgba(135, 206, 235, 0.2);
+    }*/
+
+    #div490f8636502541beb2ad5551784cd3d3 {
+        width: 80%;
+        margin: auto;
+    }
+
+    #div490f8636502541beb2ad5551784cd3d3 a,
+    #div490f8636502541beb2ad5551784cd3d3 button {
+        padding: 10px 20px;
+        color: blue;
+        font-size: 12px;
+        background-color: rgba(0, 0, 0, 0);
+        border-radius: 20px;
+        border: 1px solid blue;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-block;
+        margin: 10px;
+    }
+
+    #div490f8636502541beb2ad5551784cd3d3 a:hover,
+    #div490f8636502541beb2ad5551784cd3d3 button:hover {
+        background-color: rgba(135, 206, 235, 0.2);
+    }
+
+    #div490f8636502541beb2ad5551784cd3d3 a#fullBackup-btn:hover {
+        background-color: orange;
+    }
+
+    @@media screen and (max-width:800px) {
+        #div490f8636502541beb2ad5551784cd3d3 {
+            width: 100%;
+        }
+    }
+</style>
+<div id="div490f8636502541beb2ad5551784cd3d3">
+    <p id="backup-description" style="color: red;text-align: center;">@ViewBag.BackupDescription</p>
+    <table id="table490f8636502541beb2ad5551784cd3d3">
+        <tbody>
+            <tr>
+                <th>Backup Name</th>
+                <th>Last Time Backup</th>
+                <th>Action</th>
+            </tr>
+            <tr>
+                <td>@ViewBag.ControllerName Backup</td>
+                <td>@ViewBag.BackupDate?.ToString()</td>
+                <td>
+                    <a asp-action="RenewBackup" asp-controller="@ViewBag.ControllerName">Renew</a>
+                    @if (ViewBag.BackupDate is not null)
+                    {
+                        <a asp-action="DownloadBackup" asp-controller="@ViewBag.ControllerName">Download</a>
+                        <a asp-action="DeleteBackup" asp-controller="@ViewBag.ControllerName">Delete</a>
+                        <a asp-action="RecoverLastBackup" asp-controller="@ViewBag.ControllerName">Recover</a>
+                    }
+                    <button onclick="showModal(document.getElementById('backupFileModal'));">
+                        Upload
+                    </button>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+    <!--------------------------------------------------------------------->
+    <style>
+        #div490f8636502541beb2ad5551784cd3d3 .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(5px);
+            width: 100%;
+        }
+
+        #div490f8636502541beb2ad5551784cd3d3 .modal form {
+            width: fit-content;
+            margin: 100px auto;
+            background-color: white;
+            display: block;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #div490f8636502541beb2ad5551784cd3d3 .modal form input {
+            font-size: 16px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid gray;
+            width: 300px;
+        }
+
+        #div490f8636502541beb2ad5551784cd3d3 .modal form input[type=submit] {
+            cursor: pointer;
+        }
+
+        #div490f8636502541beb2ad5551784cd3d3 .modal form input[type=submit]:hover {
+            background-color: white;
+        }
+
+        #div490f8636502541beb2ad5551784cd3d3 .modal #close-btn {
+            font-size: 40px;
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            cursor: pointer;
+        }
+
+        #div490f8636502541beb2ad5551784cd3d3 .modal #close-btn:hover {
+            color: red;
+        }
+    </style>
+    <div class="modal" id="backupFileModal">
+        <span id="close-btn" onclick="hideModal(this.parentElement);">&times;</span>
+        <form asp-controller="@ViewBag.ControllerName" asp-action="UploadBackup" method="post"
+            enctype="multipart/form-data">
+            <div>
+                <label for="backupZipFile">Select Identity Backup File:</label>
+                <input name="backupZipFile" id="backupZipFile" type="file" value="" style="border:none;">
+            </div>
+            <input type="submit" value="Submit" style="display:block;width:fit-content;margin: 20px auto;">
+        </form>
+    </div>
+
+    <script>
+        function showModal(modalDiv) {
+            modalDiv.style.display = "block";
+        }
+        function hideModal(modalDiv) {
+            modalDiv.style.display = "none";
+        }
+    </script>
+</div>

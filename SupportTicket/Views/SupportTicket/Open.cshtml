@@ -1,0 +1,192 @@
+@model SupportTicket_OpenModel
+
+<!------------------------------------------------------------------>
+<style>
+    #form1d898ccb95204072a1885989d2a10412 {
+        width: 60%;
+        margin: auto;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 input[type=text],
+    #form1d898ccb95204072a1885989d2a10412 input[type=file],
+    #form1d898ccb95204072a1885989d2a10412 select,
+    #form1d898ccb95204072a1885989d2a10412 textarea,
+    #form1d898ccb95204072a1885989d2a10412 a {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 textarea {
+        resize: vertical;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 label {
+        padding: 12px 12px 12px 0;
+        display: inline-block;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 a#delete-btn {
+        background-color: orange;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        float: left;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 a#delete-btn:hover {
+        background-color: red;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 a#reply-btn {
+        background-color: rgb(205, 247, 255);
+        color: #333;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        float: right;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 a#reply-btn:hover {
+        background-color: rgb(105, 255, 210);
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 {
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 .col-25 {
+        float: left;
+        width: 25%;
+        margin-top: 6px;
+    }
+
+    #form1d898ccb95204072a1885989d2a10412 .col-75 {
+        float: left;
+        width: 75%;
+        margin-top: 6px;
+    }
+
+    @@media screen and (max-width: 800px) {
+        #form1d898ccb95204072a1885989d2a10412 {
+            width: 100%;
+        }
+    }
+
+    /* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */
+    @@media screen and (max-width: 600px) {
+
+        #form1d898ccb95204072a1885989d2a10412 .col-25,
+        #form1d898ccb95204072a1885989d2a10412 .col-75,
+        #form1d898ccb95204072a1885989d2a10412 input[type=submit] {
+            width: 100%;
+            margin-top: 0;
+        }
+    }
+</style>
+<div id="form1d898ccb95204072a1885989d2a10412">
+    <!--h2 style="text-align: center;">Message to Admin</h2-->
+    <form>
+        <div class="clearfix">
+            <div class="col-25">
+                <label>From:</label>
+            </div>
+            <div class="col-75">
+                @if (User.IsInRole("Identity_Admins"))
+                {
+                    <a asp-controller="Identity" asp-action="EditUser"
+                        asp-route-userGuid="@(Model.FromUser?.UserGuid ?? "_")" style="display:block;width:fit-content;">
+                        <i class="fa-regular fa-id-badge"></i> @(Model.FromUser?.UserName ?? "_")
+                    </a>
+                }
+                else
+                {
+                    <input disabled type="text" readonly value="@(Model.FromUser?.UserName ?? "_")">
+                }
+            </div>
+        </div>
+        <div class="clearfix">
+            <div class="col-25">
+                <label>Subject:</label>
+            </div>
+            <div class="col-75">
+                <input type="text" disabled readonly value="@Model.Subject">
+            </div>
+        </div>
+        <div class="clearfix">
+            <div class="col-25">
+                <label>Message:</label>
+            </div>
+            <div class="col-75">
+                <textarea readonly disabled style="height:200px">@Model.MessageText</textarea>
+            </div>
+        </div>
+        @if (Model.AttachedFileName is not null)
+        {
+            <div class="clearfix">
+                <div class="col-25">
+                    <label>File:</label>
+                </div>
+                <div class="col-75">
+                    <a asp-action="DownloadAttachedFile" asp-route-messageGuid="@Model.MessageGuid"
+                        style="display:block;width:fit-content;">
+                        <i class="fa-solid fa-file-arrow-down"></i> @Model.AttachedFileName
+                    </a>
+                </div>
+                <br>
+            </div>
+        }
+        <div class="clearfix">
+            @if (User.IsInRole("SupportTicket_Admins"))
+            {
+                <a asp-action="DeleteMessage" asp-route-messageGuid="@Model.MessageGuid" id="delete-btn"
+                    style="display:block;width:fit-content;">Delete
+                </a>
+            }
+            @if (Model.FromUser?.UserName != null && Model.FromUser.UserName != User.Identity!.Name!)
+            {
+                <a asp-action="NewMessage" asp-route-toUsernames="@Model.FromUser.UserName" id="reply-btn"
+                    style="display:block;width:fit-content;">Reply
+                </a>
+            }
+        </div>
+
+    </form>
+</div>
+
+<!--------------------------------------------------------------->
+
+@if (User.IsInRole("SupportTicket_Admins"))
+{
+    <style>
+        #hr5012ee2da3a449a78539e32f813e132c {
+            margin: 50px 0 0;
+            overflow: visible;
+            height: 1px;
+        }
+
+        #hr5012ee2da3a449a78539e32f813e132c::after {
+            content: "Seen by";
+            position: relative;
+            top: -15px;
+            right: -50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            border: 1px solid gray;
+            background-color: white;
+            padding: 5px;
+            display: block;
+            width: fit-content;
+            text-align: center;
+        }
+    </style>
+    <hr id="hr5012ee2da3a449a78539e32f813e132c">
+    <!--------------------------------------------------------------->
+    <partial name="ListOfUsers" model="@Model.SeenByClients" />
+}

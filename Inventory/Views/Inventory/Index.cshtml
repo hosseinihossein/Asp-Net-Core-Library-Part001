@@ -1,0 +1,196 @@
+@model List<Inventory_ItemModel>
+
+<!--------------------------------------------------------------->
+<style>
+    /* Center website */
+    #main6ab050e66af043c7878b427540a67992 {
+        /*max-width: 1000px;*/
+        width: 90%;
+        margin: auto;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 h1 {
+        font-size: 50px;
+        word-break: break-all;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .row {
+        margin: 8px -16px;
+        height: 300px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    /* Add padding BETWEEN each column (if you want) */
+    #main6ab050e66af043c7878b427540a67992 .row,
+    #main6ab050e66af043c7878b427540a67992 .row>.column {
+        padding: 8px;
+    }
+
+    /* Create three equal columns that floats next to each other */
+    #main6ab050e66af043c7878b427540a67992 .column {
+        float: left;
+        width: 30%;
+        display: block;
+        /* Hide columns by default */
+        margin: auto;
+        position: relative;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .column:hover {
+        background-color: #ddd;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .column img {
+        /*height: 100px;*/
+        max-height: 200px;
+        /*min-height: 200px;*/
+        width: 100%;
+        object-fit: contain;
+    }
+
+    /* Content */
+    #main6ab050e66af043c7878b427540a67992 .content {
+        background-color: white;
+        padding: 10px;
+        /*position: relative;*/
+        max-height: 300px;
+        overflow: hidden;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .content h4 {
+        margin: 10px 0;
+        padding: 0;
+        float: left;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .content .rating {
+        float: right;
+        padding: 10px 0px 0 0;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .content .rating span {
+        margin-left: 5px;
+        font-size: 14px;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .content .rating span i {
+        font-size: 18px;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .content p {
+        width: 100%;
+        padding: 5px;
+        transition: all 0.3s;
+        margin: 0px 0;
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .content:hover p {
+        transform: translateY(calc(0px - 100%));
+        background-color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+    }
+
+    #main6ab050e66af043c7878b427540a67992 .column a {
+        text-decoration: none;
+        color: #222;
+    }
+
+    /* Style the buttons */
+    #main6ab050e66af043c7878b427540a67992 .btn {
+        border: none;
+        outline: none;
+        padding: 8px 12px;
+        background-color: white;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    /* Add a grey background color on mouse-over */
+    #main6ab050e66af043c7878b427540a67992 .btn:hover {
+        background-color: #ddd;
+    }
+
+    /* Add a dark background color to the active button */
+    #main6ab050e66af043c7878b427540a67992 .btn.active {
+        background-color: #666;
+        color: white;
+    }
+
+    @@media screen and (max - width:800px) {
+        #main6ab050e66af043c7878b427540a67992 .column {
+            width: 45%;
+        }
+    }
+
+    @@media screen and (max - width:450px) {
+        #main6ab050e66af043c7878b427540a67992 .column {
+            width: 80%;
+        }
+    }
+</style>
+
+<div id="main6ab050e66af043c7878b427540a67992">
+    <h2 class="clearfix">INVENTORY
+        @if (User.IsInRole("Inventory_Admins") || User.IsInRole("Inventory_Item_Creators"))
+        {
+            <a asp-action="AddItem" style="color: lawngreen;text-decoration:none;float: right;">
+                <i class="fa-solid fa-square-plus"></i>
+                <span style="font-size:14px;">Add New Item</span>
+            </a>
+        }
+        @if (User.IsInRole("Inventory_Admins"))
+        {
+            <a asp-controller="Inventory" asp-action="Backup"
+                style="color:blue;text-decoration:none;float:right;padding-right:10px;">
+                <i class="fa-solid fa-database"></i>
+                <span style="font-size:14px;">Inentory Backup</span>
+            </a>
+        }
+    </h2>
+    <div id="myBtnContainer">
+        <a class="btn @(!(Context.Request.QueryString.Value?.Contains("category") ?? false) ? "active" : "")"
+            asp-action="Index">
+            Show all</a>
+        <a class="btn @(Context.Request.QueryString.Value?.Contains("category1") ?? false ? "active" : "")"
+            asp-action="Index" asp-route-category="category1">
+            category1</a>
+        <a class="btn @(Context.Request.QueryString.Value?.Contains("category2") ?? false ? "active" : "")"
+            asp-action="Index" asp-route-category="category2">
+            category2</a>
+        <a class="btn @(Context.Request.QueryString.Value?.Contains("category3") ?? false ? "active" : "")"
+            asp-action="Index" asp-route-category="category3">
+            category3</a>
+    </div>
+
+    <!-- Portfolio Gallery Grid -->
+    <div class="row clearfix">
+        @foreach (Inventory_ItemModel item in Model)
+        {
+            <div class="column">
+                <a asp-action="Item" asp-route-itemGuid="@item.Guid">
+                    <div class="content">
+                        <img src="/Inventory/ItemImage?itemGuid=@item.Guid">
+                        <div class="clearfix">
+                            <h4>@item.Name</h4>
+                            <div class="rating" style="float: right;">
+                                <span>@item.ReviewModel.LikeUsernames.Count <i class="fa-regular fa-heart"></i></span>
+                                <span>@item.ReviewModel.ThumbsUpUsernames.Count <i
+                                        class="fa-regular fa-thumbs-up"></i></span>
+                                <span>@item.ReviewModel.ThumbsDownUsernames.Count <i
+                                        class="fa-regular fa-thumbs-down"></i></span>
+                            </div>
+                        </div>
+                        <p>@item.Description</p>
+                    </div>
+                </a>
+            </div>
+        }
+        <!-- END GRID -->
+    </div>
+</div>
+
+<!---------------- Pagination ----------------->
+<partial name="Pagination" />

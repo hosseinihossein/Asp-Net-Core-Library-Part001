@@ -1,0 +1,261 @@
+@model Inventory_ItemModel
+
+<!---------------------------------------------------->
+<div id="card056727fbdf2d482298a00195ee6e6ac0" class="clearfix">
+    <style>
+        #card056727fbdf2d482298a00195ee6e6ac0 {
+            width: 80%;
+            height: 100vh;
+            border-radius: 20px;
+            box-shadow: 3px 3px 30px rgba(200, 200, 200, 0.5);
+            position: relative;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .left-col {
+            float: left;
+            width: 40%;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .left-col>img {
+            width: 100%;
+            max-height: 100vh;
+            object-fit: contain;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col {
+            /*float: right;*/
+            width: 60%;
+            height: 100%;
+            padding: 30px;
+            position: absolute;
+            left: 40%;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col>h1 {
+            margin: 0;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col .tab-box {
+            margin-top: 20px;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col .tab-button-box button {
+            background-color: rgba(0, 0, 0, 0);
+            border: none;
+            font-weight: bold;
+            color: gray;
+            cursor: pointer;
+            border-bottom: 2px solid white;
+            margin: 0 5px;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col .tab-button-box button:hover {
+            border-bottom: 2px solid gray;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col .tab-button-box button.active {
+            color: red;
+            border-bottom: 2px solid red;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col .quick-tab .description {
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col .tab-content-box .tab {
+            display: none;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col .tab-content-box .tab.show {
+            display: block;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col>.button-box {
+            margin: 40px 0 20px;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col>.button-box button,
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col>.button-box a {
+            border: 2px solid white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            color: white;
+            background-color: lightgray;
+            text-decoration: none;
+            margin: 0 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col>.button-box button {
+            background-color: rgb(0, 204, 255);
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col>.button-box button:hover {
+            border-color: orange;
+        }
+
+        #card056727fbdf2d482298a00195ee6e6ac0 .right-col>.button-box a:hover {
+            border-color: gray;
+        }
+
+        @@media screen and (max-width:1000px) {
+            #card056727fbdf2d482298a00195ee6e6ac0 {
+                width: 100%;
+            }
+        }
+
+        @@media screen and (max-width:800px) {
+            #card056727fbdf2d482298a00195ee6e6ac0 {
+                width: 100%;
+                height: 200vh;
+            }
+
+            #card056727fbdf2d482298a00195ee6e6ac0 .left-col {
+                width: 100%;
+            }
+
+            #card056727fbdf2d482298a00195ee6e6ac0 .right-col {
+                width: 100%;
+                position: relative;
+                left: 0;
+            }
+
+            #card056727fbdf2d482298a00195ee6e6ac0 .right-col>.button-box * {
+                display: block;
+                margin: 10px auto;
+                width: 80%;
+            }
+
+            #card056727fbdf2d482298a00195ee6e6ac0 .right-col .tab-button-box button {
+                margin: 0;
+            }
+        }
+    </style>
+
+    <div class="left-col">
+        <img src="/Inventory/ItemImage?itemGuid=@Model.Guid" alt="">
+    </div>
+    <div class="right-col">
+        <h1>@Model.Name</h1>
+        <div class="tab-box">
+            <div class="tab-button-box">
+                <button class="active" onclick="displayTab_card056727fbdf2d482298a00195ee6e6ac0(this, 'quick-tab')">
+                    QUICK
+                </button>
+                <button onclick="displayTab_card056727fbdf2d482298a00195ee6e6ac0(this, 'details-tab')">DETAILS</button>
+                <button id="reviews-tab-btn"
+                    onclick="displayTab_card056727fbdf2d482298a00195ee6e6ac0(this, 'reviews-tab')">REVIEWS</button>
+                <button onclick="displayTab_card056727fbdf2d482298a00195ee6e6ac0(this, 'size-and-fit-tab')">
+                    SIZE & FIT</button>
+            </div>
+            <div class="tab-content-box">
+                <div class="tab quick-tab show">
+                    <p class="description">@Model.Description</p>
+
+                    <div id="reviewContainer" class="clearfix">
+                        <style>
+                            #card056727fbdf2d482298a00195ee6e6ac0 #reviewContainer {
+                                min-height: 150px;
+                                position: absolute;
+                                bottom: 20px;
+                                left: 30px;
+                                right: 0;
+                            }
+                        </style>
+
+                        <div id="ReviewCommentForm-box">
+                            <partial name="ReviewCommentForm" model="@Model.ReviewModel" />
+                        </div>
+
+                        <div id="ReviewLike-box">
+                            <style>
+                                #card056727fbdf2d482298a00195ee6e6ac0 #reviewContainer #ReviewLike-box {
+                                    float: left;
+                                    width: 15%;
+                                    height: 100%;
+                                    text-align: center;
+                                }
+                            </style>
+                            <partial name="ReviewLike" model="@Model.ReviewModel" />
+                        </div>
+
+                        <div id="ReviewRatingStars-box">
+                            <partial name="ReviewRatingStars" model="@Model.ReviewModel" />
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab details-tab">
+                    <p>this is details tab</p>
+                </div>
+                <div class="tab reviews-tab">
+
+                    <div id="ReviewComments-box">
+                        <style>
+                            #card056727fbdf2d482298a00195ee6e6ac0 #ReviewComments-box {
+                                position: absolute;
+                                top: 120px;
+                                left: 30px;
+                                right: 30px;
+                                bottom: 30px;
+                                overflow: auto;
+                            }
+                        </style>
+                        <partial name="ReviewComments" model="@Model.ReviewModel" />
+                    </div>
+
+                </div>
+                <div class="tab size-and-fit-tab">
+                    <p>this is size and fit tab</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function displayTab_card056727fbdf2d482298a00195ee6e6ac0(element, tabClassName) {
+            let allTabs = element.parentElement.parentElement.getElementsByClassName("tab");
+            for (let i = 0; i < allTabs.length; i++) {
+                allTabs[i].classList.remove("show");
+            }
+            let selectedTab = element.parentElement.parentElement.getElementsByClassName(tabClassName)[0];
+            selectedTab.classList.add("show");
+
+            let allButtons = element.parentElement.getElementsByTagName("button");
+            for (let i = 0; i < allButtons.length; i++) {
+                allButtons[i].classList.remove("active");
+            }
+            element.classList.add("active");
+        }
+    </script>
+
+    @if (User.IsInRole("Inventory_Admins") || (User.Identity is not null && User.Identity.Name ==
+    Model.Owner?.UserName))
+    {
+        <style>
+            #card056727fbdf2d482298a00195ee6e6ac0 #delete-btn {
+                color: orangered;
+                background-color: white;
+                border: 1px solid red;
+                padding: 10px 20px;
+                border-radius: 5px;
+                position: absolute;
+                left: 10px;
+                bottom: 10px;
+                z-index: 1;
+            }
+
+            #card056727fbdf2d482298a00195ee6e6ac0 #delete-btn:hover {
+                color: white;
+                background-color: red;
+            }
+        </style>
+        <a asp-action="DeleteItem" asp-route-itemGuid="@Model.Guid" id="delete-btn">Delete</a>
+    }
+</div>

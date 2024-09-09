@@ -1,0 +1,79 @@
+@model Identity_LoginModel
+
+<!---------------------------------------------------->
+<style>
+    #forma520841a765e47a8baf273cf8675b3a4 {
+        width: 60%;
+        margin: auto;
+    }
+
+    /* Style the form element with a border around it */
+    #forma520841a765e47a8baf273cf8675b3a4 form {
+        border: 4px solid #f1f1f1;
+    }
+
+    /* Add some padding and a grey background color to containers */
+    #forma520841a765e47a8baf273cf8675b3a4 .container {
+        padding: 20px;
+        background-color: #f1f1f1;
+    }
+
+    /* Style the input elements and the submit button */
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=text],
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=submit] {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    /* Add margins to the checkbox */
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=checkbox] {
+        margin-top: 16px;
+        transform: scale(150%);
+    }
+
+    /* Style the submit button */
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=submit] {
+        background-color: #04AA6D;
+        color: white;
+        border: none;
+    }
+
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=submit]:hover {
+        opacity: 0.8;
+    }
+
+    @@media screen and (max-width:800px) {
+        #forma520841a765e47a8baf273cf8675b3a4 {
+            width: 100%;
+        }
+    }
+</style>
+
+<div id="forma520841a765e47a8baf273cf8675b3a4">
+    <form asp-action="SubmitLogin" method="post">
+        <div class="container">
+            <h2 style="text-align: center;">Login Form</h2>
+        </div>
+        <div asp-validation-summary="All" style="color: red;"></div>
+        <input type="hidden" asp-for="ReturnUrl">
+        <div class="container" style="background-color:white">
+            <input type="text" placeholder="Username or Email" asp-for="UsernameOrEmail">
+            <input type="text" placeholder="Password" asp-for="Password">
+            <label style="font-size: 14px;">
+                <input type="checkbox" asp-for="IsPersistent">
+                Stay Logged In
+            </label>
+        </div>
+
+        <div class="container">
+            <input type="submit" value="Login">
+        </div>
+    </form>
+</div>
+
+<!---------------------------------------------------->

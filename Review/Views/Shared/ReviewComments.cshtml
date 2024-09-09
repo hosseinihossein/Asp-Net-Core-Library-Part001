@@ -1,0 +1,766 @@
+@model Review_ReviewModel
+@{
+    string replyClass = string.Empty;
+}
+<!----------------------------------------------->
+<style>
+    #comments636958d040734b079c077b199954a852 {
+        margin: 0 auto;
+        width: 100%;
+        padding: 0;
+    }
+
+    #comments636958d040734b079c077b199954a852 .container {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0 0;
+        position: relative;
+    }
+
+    #comments636958d040734b079c077b199954a852 .container h4 {
+        margin: 5px 0 5px;
+    }
+
+    #comments636958d040734b079c077b199954a852 .container p {
+        font-size: 15px;
+        margin: 5px 0;
+    }
+
+    #comments636958d040734b079c077b199954a852 .container.reply {
+        border-color: #ccc;
+        background-color: #ddd;
+        width: 95%;
+        margin: 5px 0 0 5%;
+    }
+
+    #comments636958d040734b079c077b199954a852 .container .counterSpanInComment {
+        font-size: 12px;
+        padding-top: 10px;
+        margin: 0;
+    }
+
+    #comments636958d040734b079c077b199954a852 .container::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    #comments636958d040734b079c077b199954a852 .commentDateSpan {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        color: #555;
+        font-size: 12px;
+    }
+
+    #comments636958d040734b079c077b199954a852 .comment-btn-box * {
+        float: right;
+        margin: 0 5px;
+    }
+
+    #comments636958d040734b079c077b199954a852 .comment-btn-box button:not(.reply-btn) {
+        background-color: rgba(0, 0, 0, 0);
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        margin: 0;
+        padding: 5px 0 0 0;
+    }
+
+    #comments636958d040734b079c077b199954a852 .comment-btn-box button.reply-btn {
+        background-color: rgba(0, 0, 0, 0);
+        border: 1px solid gray;
+        border-radius: 5px;
+        font-size: 12px;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    #comments636958d040734b079c077b199954a852 .form-div {
+        display: none;
+        height: 0;
+    }
+
+    #comments636958d040734b079c077b199954a852 .form-div.show {
+        display: block;
+        height: fit-content;
+    }
+</style>
+<div id="comments636958d040734b079c077b199954a852">
+    <h2 id="firstCommentAfter">Comments:</h2>
+    @foreach (Review_CommentModel commentModel in Model.CommentModels)
+    {
+        @if (commentModel.ParentCommentUsername != null)
+        {
+            replyClass = "reply";
+        }
+        else
+        {
+            replyClass = "";
+        }
+        <div class="container @replyClass">
+            <h4>@commentModel.WriterUsername
+                @if (commentModel.ParentCommentUsername != null)
+                {
+                    <span style="font-size: 14px;font-weight: normal;"> to</span>
+                    @commentModel.ParentCommentUsername
+                }
+            :</h4>
+            <p>@commentModel.CommentText</p>
+            <span class="commentDateSpan">@commentModel.Date.ToShortDateString()</span>
+            <div class="comment-btn-box clearfix">
+                <button onclick="showFormForComment(this)" class="reply-btn">Reply</button>
+                <!------ like heart ------>
+                <div style="margin-right: 5px;">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated && commentModel.LikeUsernames.Contains(User.Identity!.Name!))
+                    {
+                        <button style="color: gray;display: none;"
+                            onclick="likeComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="likeLink"></a>
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        <button style="color: red;" onclick="unlikeComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="unlikeLink"></a>
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button style="color: gray;" 
+                        @if(User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                        @:onclick="likeComment(this, '@commentModel.CommentGuid')"
+                        }
+                        else
+                        {
+                            @:onclick="pleaseLogin_0634ff6e96534e119c02a3ff38059cb8()"
+                        }
+                        >
+                            <a style="display: none;" id="likeLink"></a>
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        <button style="color: red;display: none;"
+                            onclick="unlikeComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="unlikeLink"></a>
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                    }
+
+                    <span onclick="getLikesListForComment('@commentModel.CommentGuid')" class="counterSpanInComment"
+                        id="likeCounterHeart">@commentModel.LikeUsernames.Count</span>
+                </div>
+                <!------ like thumb up ------>
+                <div style="margin-right: 5px;">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated && commentModel.ThumbsUpUsernames.Contains(User.Identity!.Name!))
+                    {
+                        <button id="thumb-up-like-btn" style="color: gray;display: none;"
+                            onclick="thumbsUpComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="likeLinkThumbUp"></a>
+                            <i class="fa-regular fa-thumbs-up"></i>
+                        </button>
+                        <button id="thumb-up-unlike-btn" style="color: skyblue;"
+                            onclick="unThumbsUpComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button id="thumb-up-like-btn" style="color: gray;"
+                            @if(User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                            @:onclick="thumbsUpComment(this, '@commentModel.CommentGuid')"
+                            }
+                            else
+                            {
+                                @:onclick="pleaseLogin_0634ff6e96534e119c02a3ff38059cb8()"
+                            }
+                            >
+                            <a style="display: none;" id="likeLinkThumbUp"></a>
+                            <i class="fa-regular fa-thumbs-up"></i>
+                        </button>
+                        <button id="thumb-up-unlike-btn" style="color: skyblue;display: none;"
+                            onclick="unThumbsUpComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </button>
+                    }
+
+                    <span onclick="getThumbsUpListForComment('@commentModel.CommentGuid')"
+                        class="counterSpanInComment"
+                        id="likeCounterThumbUp">@commentModel.ThumbsUpUsernames.Count</span>
+                </div>
+                <!------ dislike thumb down ------>
+                <div style="margin-right: 5px;">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated && commentModel.ThumbsDownUsernames.Contains(User.Identity!.Name!))
+                    {
+                        <button id="thumb-down-dislike-btn" style="color: gray;display: none;"
+                            onclick="thumbsDownComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="dislikeLinkThumbUp"></a>
+                            <i class="fa-regular fa-thumbs-down"></i>
+                        </button>
+                        <button id="thumb-down-unDislike-btn" style="color: skyblue;"
+                            onclick="unThumbsDownComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                            <i class="fa-solid fa-thumbs-down"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button id="thumb-down-dislike-btn" style="color: gray;"
+                            @if(User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                            @:onclick="thumbsDownComment(this, '@commentModel.CommentGuid')"
+                            }
+                            else
+                            {
+                                @:onclick="pleaseLogin_0634ff6e96534e119c02a3ff38059cb8()"
+                            }
+                            >
+                            <a style="display: none;" id="dislikeLinkThumbUp"></a>
+                            <i class="fa-regular fa-thumbs-down"></i>
+                        </button>
+                        <button id="thumb-down-unDislike-btn" style="color: skyblue;display: none;"
+                            onclick="unThumbsDownComment(this, '@commentModel.CommentGuid')">
+                            <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                            <i class="fa-solid fa-thumbs-down"></i>
+                        </button>
+                    }
+
+                    <span onclick="getThumbsDownListForComment('@commentModel.CommentGuid')"
+                        class="counterSpanInComment"
+                        id="dislikeCounterThumbDown">@commentModel.ThumbsDownUsernames.Count</span>
+                </div>
+                @if (User.IsInRole("Review_Admins") || User.Identity?.Name == commentModel.WriterUsername)
+                {
+                    <a asp-controller="Review" asp-action="DeleteComment"
+                        asp-route-commentGuid="@commentModel.CommentGuid" style="color: red;margin-right: 20px;"><i
+                            class="fa-solid fa-trash-can"></i>
+                    </a>
+                }
+            </div>
+            <div class="form-div clearfix">
+                <form asp-action="SubmitCommentReply" method="post">
+                    <textarea name="" id="" placeholder="Reply.." style="width:50%;max-width:80%;height:50px;padding:10px;float:left;"></textarea>
+                    <input
+                        @if(User.Identity is not null && User.Identity.IsAuthenticated)
+                        {
+                            @:onclick="sendCommentForComment(this, '@commentModel.CommentGuid', '@commentModel.WriterUsername')"
+                        }
+                        else
+                        {
+                            @:onclick="pleaseLogin_0634ff6e96534e119c02a3ff38059cb8()"
+                        }
+                        value="Send" type="button" style="text-align: center;width: fit-content;
+                        cursor: pointer;padding:5px 10px;position:absolute;bottom:10px;margin-left:5px;">
+                </form>
+            </div>
+        </div>
+    }
+</div>
+<script>
+    //***************** Comment *****************
+    function likeComment(element, commentGuid) {
+        let likeUrl = `/Review/LikeComment?commentGuid=${commentGuid}`;//likeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterHeart");
+        fetch(`${likeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.nextElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) + 1;
+    }
+
+    function unlikeComment(element, commentGuid) {
+        let unlikeUrl = `/Review/UnLikeComment?commentGuid=${commentGuid}`;//unlikeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterHeart");
+        fetch(`${unlikeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.previousElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
+    }
+
+    function thumbsUpComment(element, commentGuid) {
+        let likeUrl = `/Review/ThumbsUpComment?commentGuid=${commentGuid}`;//likeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterThumbUp");
+        fetch(`${likeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.nextElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) + 1;
+
+        let thumbDownDisLikeBtn = element.parentElement.nextElementSibling.querySelector("#thumb-down-dislike-btn");
+        let thumbDownUnDislikeBtn = element.parentElement.nextElementSibling.querySelector("#thumb-down-unDislike-btn");
+        let likeCounterThumbDown = element.parentElement.nextElementSibling.querySelector("#dislikeCounterThumbDown");
+        if (thumbDownUnDislikeBtn.style.display != "none") {
+            thumbDownUnDislikeBtn.style.display = "none";
+            thumbDownDisLikeBtn.style.display = "inline";
+            likeCounterThumbDown.innerHTML = Number(likeCounterThumbDown.innerHTML) - 1;
+        }
+    }
+
+    function unThumbsUpComment(element, commentGuid) {
+        //let unlikeLinkElement = element.querySelector("#unlikeLinkThumbUp");
+        let unlikeUrl = `/Review/UnThumbsUpComment?commentGuid=${commentGuid}`;//unlikeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterThumbUp");
+        fetch(`${unlikeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.previousElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
+    }
+
+    function thumbsDownComment(element, commentGuid) {
+        //let likeLinkElement = element.querySelector("#dislikeLinkThumbUp");
+        let likeUrl = `/Review/ThumbsDownComment?commentGuid=${commentGuid}`;//likeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#dislikeCounterThumbDown");
+        fetch(`${likeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.nextElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) + 1;
+
+        let thumbUpLikeBtn = element.parentElement.previousElementSibling.querySelector("#thumb-up-like-btn");
+        let thumbUpUnlikeBtn = element.parentElement.previousElementSibling.querySelector("#thumb-up-unlike-btn");
+        let likeCounterThumbUp = element.parentElement.previousElementSibling.querySelector("#likeCounterThumbUp");
+        if (thumbUpUnlikeBtn.style.display != "none") {
+            thumbUpUnlikeBtn.style.display = "none";
+            thumbUpLikeBtn.style.display = "inline";
+            likeCounterThumbUp.innerHTML = Number(likeCounterThumbUp.innerHTML) - 1;
+        }
+    }
+
+    function unThumbsDownComment(element, commentGuid) {
+        //let unlikeLinkElement = element.querySelector("#unDislikeLinkThumbUp");
+        let unlikeUrl = `/Review/UnThumbsDownComment?commentGuid=${commentGuid}`;//unlikeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#dislikeCounterThumbDown");
+        fetch(`${unlikeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.previousElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
+    }
+
+    //**********************************************
+    function showFormForComment(element) {
+        let formDiv = element.parentElement.nextElementSibling;
+        formDiv.classList.toggle("show");
+        if (element.innerText == "Reply") {
+            element.innerText = "Close Reply";
+        }
+        else {
+            element.innerText = "Reply";
+        }
+    }
+
+    //********************* send comment *********************
+    function sendCommentForComment(element, parentCommentGuid, parentCommentUsername) {
+        let textareaElement = element.previousElementSibling;
+        let commentText = textareaElement.value;
+        if (commentText.trim() == "") return;
+        //let submitCommentUrl = document.getElementById("submitCommentUrlForComment").href;
+
+        let newCommentElement = document.createElement("div");
+        newCommentElement.classList.add("container");
+        newCommentElement.classList.add("reply");
+        newCommentElement.innerHTML = 
+        `<h4>@User.Identity!.Name <span style="font-size: 14px;font-weight: normal;">to</span> ${parentCommentUsername}:</h4>
+        <p>${commentText}</p>
+        <span class="commentDateSpan">${new Date(Date.now()).toLocaleDateString()}</span>
+        <div class="comment-btn-box clearfix">
+        <button onclick="showFormForComment(this)" class="reply-btn">Reply</button>
+        <!------ like heart ------>
+        <div style="margin-right: 5px;">
+            <button style="color: gray;" onclick="likeComment(this, '')">
+                    <a style="display: none;" id="likeLink"></a>
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+                <button style="color: red;display: none;"
+                    onclick="unlikeComment(this, '')">
+                    <a style="display: none;" id="unlikeLink"></a>
+                    <i class="fa-solid fa-heart"></i>
+                </button>
+
+            <span onclick="getLikesListForComment('')" class="counterSpanInComment"
+                id="likeCounterHeart">0</span>
+        </div>
+        <!------ like thumb up ------>
+        <div style="margin-right: 5px;">
+            <button id="thumb-up-like-btn" style="color: gray;" onclick="thumbsUpComment(this, '')">
+                    <a style="display: none;" id="likeLinkThumbUp"></a>
+                    <i class="fa-regular fa-thumbs-up"></i>
+                </button>
+                <button id="thumb-up-unlike-btn" style="color: skyblue;display: none;"
+                    onclick="unThumbsUpComment(this, '')">
+                    <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                    <i class="fa-solid fa-thumbs-up"></i>
+                </button>
+
+            <span onclick="getThumbsUpListForComment('')"
+                class="counterSpanInComment"
+                id="likeCounterThumbUp">0</span>
+        </div>
+        <!------ dislike thumb down ------>
+        <div style="margin-right: 5px;">
+            <button id="thumb-down-dislike-btn" style="color: gray;" onclick="thumbsDownComment(this, '')">
+                    <a style="display: none;" id="dislikeLinkThumbUp"></a>
+                    <i class="fa-regular fa-thumbs-down"></i>
+                </button>
+                <button id="thumb-down-unDislike-btn" style="color: skyblue;display: none;"
+                    onclick="unThumbsDownComment(this, '')">
+                    <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                    <i class="fa-solid fa-thumbs-down"></i>
+                </button>
+
+            <span onclick="getThumbsDownListForComment('')"
+                class="counterSpanInComment"
+                id="dislikeCounterThumbDown">0</span>
+        </div>
+        <a asp-controller="Review" asp-action="DeleteComment"
+            asp-route-commentGuid="" style="color: red;margin-right: 20px;"><i
+                class="fa-solid fa-trash-can"></i>
+        </a>
+        </div>
+        <div class="form-div clearfix">
+            <form asp-action="SubmitCommentReply" method="post">
+                <textarea name="" id="" placeholder="Reply.." style="width:50%;max-width:80%;height:50px;padding:10px;float:left;"></textarea>
+                <input
+                    onclick="sendCommentForComment(this, '', '@User.Identity.Name')"
+                    value="Send" type="button" style="text-align: center;width: fit-content;
+                    cursor: pointer;padding:5px 10px;position:absolute;bottom:10px;margin-left:5px;">
+            </form>
+        </div>`;
+
+        //let parentFirstLayerComment = element.parentElement.parentElement.parentElement.parentElement;
+        //parentFirstLayerComment.appendChild(newCommentElement);
+        let elementContainer = element.parentElement.parentElement.parentElement;
+        elementContainer.after(newCommentElement);
+
+        textareaElement.value = "";
+        let verificationTokenInput = element.parentElement.querySelector("input[name='__RequestVerificationToken']");
+        let formData = new FormData();
+        formData.append("commentGuid", parentCommentGuid);
+        formData.append("replyText", commentText);
+        formData.append("__RequestVerificationToken", verificationTokenInput.value);
+        fetch(`/Review/SubmitCommentReply`, {
+            credentials: "same-origin",
+            method: "POST",
+            body: formData
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.text();
+            }
+        }).then(text => {
+            let replyCommentGuid = text;
+            console.log(text);
+            newCommentElement.innerHTML = 
+            `<h4>@User.Identity!.Name <span style="font-size: 14px;font-weight: normal;">to</span> ${parentCommentUsername}:</h4>
+            <p>${commentText}</p>
+            <span class="commentDateSpan">${new Date(Date.now()).toLocaleDateString()}</span>
+            <div class="comment-btn-box clearfix">
+                <button onclick="showFormForComment(this)" class="reply-btn">Reply</button>
+                <!------ like heart ------>
+                <div style="margin-right: 5px;">
+                    <button style="color: gray;" onclick="likeComment(this, '${replyCommentGuid}')">
+                            <a style="display: none;" id="likeLink"></a>
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        <button style="color: red;display: none;"
+                            onclick="unlikeComment(this, '${replyCommentGuid}')">
+                            <a style="display: none;" id="unlikeLink"></a>
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+
+                    <span onclick="getLikesListForComment('${replyCommentGuid}')" class="counterSpanInComment"
+                        id="likeCounterHeart">0</span>
+                </div>
+                <!------ like thumb up ------>
+                <div style="margin-right: 5px;">
+                    <button id="thumb-up-like-btn" style="color: gray;" onclick="thumbsUpComment(this, '${replyCommentGuid}')">
+                            <a style="display: none;" id="likeLinkThumbUp"></a>
+                            <i class="fa-regular fa-thumbs-up"></i>
+                        </button>
+                        <button id="thumb-up-unlike-btn" style="color: skyblue;display: none;"
+                            onclick="unThumbsUpComment(this, '${replyCommentGuid}')">
+                            <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </button>
+
+                    <span onclick="getThumbsUpListForComment('${replyCommentGuid}')"
+                        class="counterSpanInComment"
+                        id="likeCounterThumbUp">0</span>
+                </div>
+                <!------ dislike thumb down ------>
+                <div style="margin-right: 5px;">
+                    <button id="thumb-down-dislike-btn" style="color: gray;" onclick="thumbsDownComment(this, '${replyCommentGuid}')">
+                            <a style="display: none;" id="dislikeLinkThumbUp"></a>
+                            <i class="fa-regular fa-thumbs-down"></i>
+                        </button>
+                        <button id="thumb-down-unDislike-btn" style="color: skyblue;display: none;"
+                            onclick="unThumbsDownComment(this, '${replyCommentGuid}')">
+                            <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                            <i class="fa-solid fa-thumbs-down"></i>
+                        </button>
+
+                    <span onclick="getThumbsDownListForComment('${replyCommentGuid}')"
+                        class="counterSpanInComment"
+                        id="dislikeCounterThumbDown">0</span>
+                </div>
+                <a asp-controller="Review" asp-action="DeleteComment"
+                    asp-route-commentGuid="${replyCommentGuid}" style="color: red;margin-right: 20px;"><i
+                        class="fa-solid fa-trash-can"></i>
+                </a>
+                <span id="deliveryConfirmed"
+                    style="float: left;display: none;color: lawngreen;font-size: 12px;margin: 0;padding: 0;">
+                    delivered<i class="fa-solid fa-check"></i>
+                </span>
+            </div>
+            <div class="form-div clearfix">
+                <form asp-action="SubmitCommentReply" method="post">
+                    <textarea name="" id="" placeholder="Reply.." style="width:50%;max-width:80%;height:50px;padding:10px;float:left;"></textarea>
+                    <input
+                        onclick="sendCommentForComment(this, '${replyCommentGuid}', '@User.Identity.Name')"
+                        value="Send" type="button" style="text-align: center;width: fit-content;
+                        cursor: pointer;padding:5px 10px;position:absolute;bottom:10px;margin-left:5px;">
+                </form>
+            </div>`;
+            newCommentElement.querySelector("#deliveryConfirmed").style.display = "inline";
+        });
+    }
+
+    //****************** For Comment *****************
+    function getLikesListForComment(commentGuid) {
+        fetch(`/Review/GetLikesListForComment?commentGuid=${commentGuid}`, {
+            credentials: "same-origin"
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then(usernames => {
+            let listItems = "";
+            for (let username of usernames) {
+                listItems +=
+                    `<li><div class="chip">
+                <a href="/Identity/Profile/${username}">
+                    <img src="/Identity/UserImage?username=${username}" alt="User Image Profile" width="96"
+                        height="96">
+                    ${username}
+                </a></div></li>`;
+            }
+            let list = `<h3>Likes:</h3><ul>${listItems}</ul>`;
+            document.getElementById("listd2b5b3e97764404ea54c84111b87a7ff").innerHTML = list;
+            showModal_5ba0c32351b64a03b60273d6ff3417c4();
+        });
+    }
+
+    function getThumbsUpListForComment(commentGuid) {
+        fetch(`/Review/GetThumbsUpListForComment?commentGuid=${commentGuid}`, {
+            credentials: "same-origin"
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then(usernames => {
+            let listItems = "";
+            for (let username of usernames) {
+                listItems +=
+                    `<li><div class="chip">
+                <a href="/Identity/Profile/${username}">
+                    <img src="/Identity/UserImage?username=${username}" alt="User Image Profile" width="96"
+                        height="96">
+                    ${username}
+                </a></div></li>`;
+            }
+            let list = `<h3>ThumbsUp:</h3><ul>${listItems}</ul>`;
+            document.getElementById("listd2b5b3e97764404ea54c84111b87a7ff").innerHTML = list;
+            showModal_5ba0c32351b64a03b60273d6ff3417c4();
+        });
+    }
+
+    function getThumbsDownListForComment(commentGuid) {
+        fetch(`/Review/GetThumbsDownListForComment?commentGuid=${commentGuid}`, {
+            credentials: "same-origin"
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then(usernames => {
+            let listItems = "";
+            for (let username of usernames) {
+                listItems +=
+                    `<li><div class="chip">
+                <a href="/Identity/Profile/${username}">
+                    <img src="/Identity/UserImage?username=${username}" alt="User Image Profile" width="96"
+                        height="96">
+                    ${username}
+                </a></div></li>`;
+            }
+            let list = `<h3>ThumbsDown:</h3><ul>${listItems}</ul>`;
+            document.getElementById("listd2b5b3e97764404ea54c84111b87a7ff").innerHTML = list;
+            showModal_5ba0c32351b64a03b60273d6ff3417c4();
+        });
+    }
+
+    function pleaseLogin_0634ff6e96534e119c02a3ff38059cb8() {
+        alert("Please login");
+    }
+</script>
+
+<!------------------------------------- modal ---------------------------------------->
+<div id="modala971a13257b0453183d8580fb66d1e97">
+    <style>
+        /* Add padding and center-align text to the container */
+        #modala971a13257b0453183d8580fb66d1e97 .container {
+            padding: 16px;
+            text-align: center;
+        }
+
+        /* The Modal (background) */
+        #modala971a13257b0453183d8580fb66d1e97 .modal {
+            display: block;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 2;
+            /* Sit on top */
+            left: 50%;
+            top: 50%;
+            width: 0;
+            /* Full width */
+            height: 0;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgba(60, 69, 88, 0.7);
+            padding-top: 0px;
+            transition: all 0.3s;
+        }
+
+        #modala971a13257b0453183d8580fb66d1e97 .modal.open {
+            /*display: block;*/
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Modal Content/Box */
+        #modala971a13257b0453183d8580fb66d1e97 .modal-content {
+            background-color: rgba(255, 255, 255, 1);
+            margin: 50px auto;
+            /*border: 1px solid #888;*/
+            width: fit-content;
+        }
+
+        /* The Modal Close Button (x) */
+        #modala971a13257b0453183d8580fb66d1e97 .close {
+            position: relative;
+            float: right;
+            right: 15px;
+            /*top: 15px;*/
+            font-size: 40px;
+            font-weight: bold;
+            color: #696969;
+            cursor: pointer;
+        }
+
+        #modala971a13257b0453183d8580fb66d1e97 .close:hover,
+        #modala971a13257b0453183d8580fb66d1e97 .close:focus {
+            color: red;
+        }
+    </style>
+
+    <div id="modal-background" class="modal">
+        <div class="modal-content" action="">
+            <span onclick="this.parentElement.parentElement.classList.remove('open');" class="close"
+                title="Close Modal">&times;</span>
+            <div class="container">
+                <style>
+                    #listd2b5b3e97764404ea54c84111b87a7ff .modal-list {
+                        display: none;
+                    }
+
+                    #listd2b5b3e97764404ea54c84111b87a7ff .modal-list.show {
+                        display: block;
+                    }
+
+                    #listd2b5b3e97764404ea54c84111b87a7ff ul {
+                        list-style-type: none;
+                        /* Remove bullets */
+                        padding: 0;
+                        /* Remove padding */
+                        margin: 0 auto;
+                        /* Remove margins */
+                        /*max-width: 320px;*/
+                        max-height: calc(90vh - 20px);
+                        overflow-y: auto;
+                    }
+
+                    #listd2b5b3e97764404ea54c84111b87a7ff ul li {
+                        border: 1px solid #ddd;
+                        /* Add a thin border to each list item */
+                        margin-top: -1px;
+                        /* Prevent double borders */
+                        background-color: #f6f6f6;
+                        /* Add a grey background color */
+                        padding: 12px;
+                        /* Add some padding */
+                        text-align: start;
+                    }
+
+                    /*********************************/
+                    #listd2b5b3e97764404ea54c84111b87a7ff .chip {
+                        display: inline-block;
+                        padding: 0 25px;
+                        height: 50px;
+                        font-size: 16px;
+                        line-height: 50px;
+                        border-radius: 25px;
+                        background-color: #f1f1f1;
+                    }
+
+                    #listd2b5b3e97764404ea54c84111b87a7ff .chip a {
+                        text-decoration: none;
+                        color: rgb(3, 3, 3);
+                    }
+
+                    #listd2b5b3e97764404ea54c84111b87a7ff .chip img {
+                        float: left;
+                        margin: 0 10px 0 -25px;
+                        height: 50px;
+                        width: 50px;
+                        border-radius: 50%;
+                    }
+                </style>
+                <!--*********************************** Lists ***********************************-->
+                <div id="listd2b5b3e97764404ea54c84111b87a7ff">
+
+                </div>
+                <!--*************************************************************************************-->
+            </div>
+        </div>
+    </div>
+    <script>
+        // When the user clicks anywhere outside of the modal, close it
+        window.addEventListener("click", (event) => {
+            // Get the modal
+            let modal = document.getElementById('modala971a13257b0453183d8580fb66d1e97').querySelector("#modal-background");
+            if (event.target == modal) {
+                modal.classList.remove('open');
+                //hideAllModalList();
+            }
+        });
+        function showModal_5ba0c32351b64a03b60273d6ff3417c4() {
+            document.getElementById("modala971a13257b0453183d8580fb66d1e97")
+                .querySelector('#modal-background').classList.add('open');
+        }
+    </script>
+</div>

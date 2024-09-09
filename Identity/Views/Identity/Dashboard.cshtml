@@ -1,0 +1,80 @@
+<!-- full height animated sidebar -->
+
+<style>
+    #sidenav016fc1163e3943f085f070c4b03924ec {
+        height: 100%;
+        width: 0;
+        position: absolute;
+        /*fixed*/
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        padding-top: 60px;
+        transition: 0.5s;
+    }
+
+    #sidenav016fc1163e3943f085f070c4b03924ec a {
+        padding: 8px 8px 8px 10px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+        text-wrap: nowrap;
+    }
+
+    #sidenav016fc1163e3943f085f070c4b03924ec a:hover {
+        color: #f1f1f1;
+    }
+
+    @@media screen and (max-height: 450px) {
+        #sidenav016fc1163e3943f085f070c4b03924ec {
+            padding-top: 15px;
+        }
+
+        #sidenav016fc1163e3943f085f070c4b03924ec a {
+            font-size: 18px;
+        }
+    }
+
+    #sidenav016fc1163e3943f085f070c4b03924ec .closebtn {
+        /*position: absolute;
+        top: 0;
+        right: 25px;
+        margin-left: 50px;*/
+        font-size: 36px;
+        text-align: right;
+        margin: 0px 10px 0px 0px;
+    }
+</style>
+
+<div id="sidenav016fc1163e3943f085f070c4b03924ec" style="width: 200px;">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav_sidenav016fc1163e3943f085f070c4b03924ec()">×</a>
+    <a asp-action="Profile" asp-route-username="@User.Identity?.Name"><i class="fa-regular fa-address-card"></i>
+        Profile</a>
+    @if (User.IsInRole("Identity_Admins"))
+    {
+        <a asp-action="UsersList" asp-controller="Identity">
+            <i class="fa-solid fa-list-ul"></i> Users List
+        </a>
+        <a asp-action="RolesList" asp-controller="Identity">
+            <i class="fa-solid fa-list-check"></i> Roles List
+        </a>
+    }
+</div>
+<p style="font-size:30px;cursor:pointer;width:fit-content;margin: 10px 0"
+    onclick="openNav_sidenav016fc1163e3943f085f070c4b03924ec()">
+    ☰ Menu
+</p>
+
+<script>
+    function openNav_sidenav016fc1163e3943f085f070c4b03924ec() {
+        document.getElementById("sidenav016fc1163e3943f085f070c4b03924ec").style.width = "200px";
+    }
+
+    function closeNav_sidenav016fc1163e3943f085f070c4b03924ec() {
+        document.getElementById("sidenav016fc1163e3943f085f070c4b03924ec").style.width = "0";
+    }
+</script>

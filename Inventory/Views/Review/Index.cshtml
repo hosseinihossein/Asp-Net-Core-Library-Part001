@@ -1,0 +1,51 @@
+@model Review_ReviewModel
+
+<!---------------------------------------------------------------->
+<div id="Review759d3dd212834ee7a082ece437e697a7" class="clearfix">
+    <style>
+        #Review759d3dd212834ee7a082ece437e697a7 {
+            width: 60%;
+            height: fit-content;
+            border: 1px solid gray;
+            border-radius: 5px;
+            margin: auto;
+            padding: 10px;
+        }
+
+        @@media screen and (max-width:1200px) {
+            #Review759d3dd212834ee7a082ece437e697a7 {
+                width: 80%;
+            }
+        }
+
+        @@media screen and (max-width:800px) {
+            #Review759d3dd212834ee7a082ece437e697a7 {
+                width: 100%;
+            }
+        }
+    </style>
+    <div id="formContainer" class="clearfix">
+        <partial name="ReviewCommentForm" model="@Model" />
+
+        <div id="likeBox">
+            <style>
+                #Review759d3dd212834ee7a082ece437e697a7 #likeBox {
+                    float: left;
+                    width: 15%;
+                    height: 100%;
+                    text-align: center;
+                }
+            </style>
+
+            <partial name="ReviewLike" model="@Model" />
+
+        </div>
+
+        <div id="ratingBox">
+            <partial name="ReviewRatingStars" model="@Model" />
+        </div>
+    </div>
+    <div id="commentContainer">
+        <partial name="ReviewComments" model="@Model" />
+    </div>
+</div>

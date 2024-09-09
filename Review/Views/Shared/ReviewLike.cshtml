@@ -1,0 +1,448 @@
+@model Review_ReviewModel
+
+<!------------------------------------------------->
+<style>
+    #liked776ef3f8ecc427d8bf3551749a76b82 button {
+        font-size: 30px;
+        text-decoration: none;
+        border: none;
+        background-color: rgba(0, 0, 0, 0);
+        cursor: pointer;
+    }
+</style>
+
+<div id="liked776ef3f8ecc427d8bf3551749a76b82">
+    <!------ like heart ------>
+    <div>
+        @if (User.Identity != null && User.Identity.IsAuthenticated && Model.LikeUsernames.Contains(User.Identity!.Name!))
+        {
+            <button style="color: gray;display: none;" onclick="likeReview(this)">
+                <a style="display: none;" id="likeLink"></a>
+                <i class="fa-regular fa-heart"></i>
+            </button>
+            <button style="color: red;" onclick="unlikeReview(this)">
+                <a style="display: none;" id="unlikeLink"></a>
+                <i class="fa-solid fa-heart"></i>
+            </button>
+        }
+        else
+        {
+            <button style="color: gray;" 
+            @if(User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                @:onclick="likeReview(this)"
+            }
+            else
+            {
+                @:onclick="pleaseLogin_4f2ac9abd82e4532aa2338762bf5d086()"
+            }
+            >
+            <a style="display: none;" id="likeLink"></a>
+            <i class="fa-regular fa-heart"></i>
+            </button>
+            <button style="color: red;display: none;" onclick="unlikeReview(this)">
+                <a style="display: none;" id="unlikeLink"></a>
+                <i class="fa-solid fa-heart"></i>
+            </button>
+        }
+        <span onclick="getLikesListForReview('@Model.ReviewGuid')" style="font-size: 14px;"
+            id="likeCounterHeart">@Model.LikeUsernames.Count</span>
+    </div>
+
+    <!------ like thumb up ------>
+    <div>
+        @if (User.Identity != null && User.Identity.IsAuthenticated && Model.ThumbsUpUsernames.Contains(User.Identity!.Name!))
+        {
+            <button id="thumb-up-like-btn" style="color: gray;display: none;" onclick="thumbsUpReview(this)">
+                <a style="display: none;" id="likeLinkThumbUp"></a>
+                <i class="fa-regular fa-thumbs-up"></i>
+            </button>
+            <button id="thumb-up-unlike-btn" style="color: skyblue;" onclick="unThumbsUpReview(this)">
+                <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                <i class="fa-solid fa-thumbs-up"></i>
+            </button>
+        }
+        else
+        {
+            <button id="thumb-up-like-btn" style="color: gray;" 
+            @if(User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                @:onclick="thumbsUpReview(this)"
+            }
+            else
+            {
+                @:onclick="pleaseLogin_4f2ac9abd82e4532aa2338762bf5d086()"
+            }
+            >
+            <a style="display: none;" id="likeLinkThumbUp"></a>
+            <i class="fa-regular fa-thumbs-up"></i>
+            </button>
+            <button id="thumb-up-unlike-btn" style="color: skyblue;display: none;" onclick="unThumbsUpReview(this)">
+                <a style="display: none;" id="unlikeLinkThumbUp"></a>
+                <i class="fa-solid fa-thumbs-up"></i>
+            </button>
+        }
+        <span onclick="getThumbsUpListForReview('@Model.ReviewGuid')" style="font-size: 14px;"
+            id="likeCounterThumbUp">
+            @Model.ThumbsUpUsernames.Count
+        </span>
+    </div>
+
+    <!------ dislike thumb down ------>
+    <div>
+        @if (User.Identity != null && User.Identity.IsAuthenticated && Model.ThumbsDownUsernames.Contains(User.Identity!.Name!))
+        {
+            <button id="thumb-down-dislike-btn" style="color: gray;display: none;" onclick="thumbsDownReview(this)">
+                <a style="display: none;" id="dislikeLinkThumbUp"></a>
+                <i class="fa-regular fa-thumbs-down"></i>
+            </button>
+            <button id="thumb-down-unDislike-btn" style="color: skyblue;" onclick="unThumbsDownReview(this)">
+                <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                <i class="fa-solid fa-thumbs-down"></i>
+            </button>
+        }
+        else
+        {
+            <button id="thumb-down-dislike-btn" style="color: gray;" 
+            @if(User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                @:onclick="thumbsDownReview(this)"
+            }
+            else
+            {
+                @:onclick="pleaseLogin_4f2ac9abd82e4532aa2338762bf5d086()"
+            }
+            >
+            <a style="display: none;" id="dislikeLinkThumbUp"></a>
+            <i class="fa-regular fa-thumbs-down"></i>
+            </button>
+            <button id="thumb-down-unDislike-btn" style="color: skyblue;display: none;"
+                onclick="unThumbsDownReview(this)">
+                <a style="display: none;" id="unDislikeLinkThumbUp"></a>
+                <i class="fa-solid fa-thumbs-down"></i>
+            </button>
+        }
+        <span onclick="getThumbsDownListForReview('@Model.ReviewGuid')" style="font-size: 14px;"
+            id="dislikeCounterThumbDown">@Model.ThumbsDownUsernames.Count</span>
+    </div>
+</div>
+<script>
+    //***************** Review *****************
+    function likeReview(element) {
+        //let likeLinkElement = element.querySelector("#likeLink");
+        let likeUrl = "/Review/LikeReview?reviewGuid=@Model.ReviewGuid";//likeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterHeart");
+        fetch(`${likeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.nextElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) + 1;
+    }
+
+    function unlikeReview(element) {
+        //let unlikeLinkElement = element.querySelector("#unlikeLink");
+        let unlikeUrl = "/Review/UnLikeReview?reviewGuid=@Model.ReviewGuid";//unlikeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterHeart");
+        fetch(`${unlikeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.previousElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
+    }
+
+    function thumbsUpReview(element) {
+        //let likeLinkElement = element.querySelector("#likeLinkThumbUp");
+        let likeUrl = "/Review/ThumbsUpReview?reviewGuid=@Model.ReviewGuid";//likeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterThumbUp");
+        fetch(`${likeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.nextElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) + 1;
+
+        let thumbDownDisLikeBtn = element.parentElement.nextElementSibling.querySelector("#thumb-down-dislike-btn");
+        let thumbDownUnDislikeBtn = element.parentElement.nextElementSibling.querySelector("#thumb-down-unDislike-btn");
+        let likeCounterThumbDown = element.parentElement.nextElementSibling.querySelector("#dislikeCounterThumbDown");
+        if (thumbDownUnDislikeBtn.style.display != "none") {
+            thumbDownUnDislikeBtn.style.display = "none";
+            thumbDownDisLikeBtn.style.display = "inline";
+            likeCounterThumbDown.innerHTML = Number(likeCounterThumbDown.innerHTML) - 1;
+        }
+    }
+
+    function unThumbsUpReview(element) {
+        //let unlikeLinkElement = element.querySelector("#unlikeLinkThumbUp");
+        let unlikeUrl = "/Review/UnThumbsUpReview?reviewGuid=@Model.ReviewGuid";//unlikeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#likeCounterThumbUp");
+        fetch(`${unlikeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.previousElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
+    }
+
+    function thumbsDownReview(element) {
+        //let likeLinkElement = element.querySelector("#dislikeLinkThumbUp");
+        let likeUrl = "/Review/ThumbsDownReview?reviewGuid=@Model.ReviewGuid";//likeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#dislikeCounterThumbDown");
+        fetch(`${likeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.nextElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) + 1;
+
+        let thumbUpLikeBtn = element.parentElement.previousElementSibling.querySelector("#thumb-up-like-btn");
+        let thumbUpUnlikeBtn = element.parentElement.previousElementSibling.querySelector("#thumb-up-unlike-btn");
+        let likeCounterThumbUp = element.parentElement.previousElementSibling.querySelector("#likeCounterThumbUp");
+        if (thumbUpUnlikeBtn.style.display != "none") {
+            thumbUpUnlikeBtn.style.display = "none";
+            thumbUpLikeBtn.style.display = "inline";
+            likeCounterThumbUp.innerHTML = Number(likeCounterThumbUp.innerHTML) - 1;
+        }
+    }
+
+    function unThumbsDownReview(element) {
+        //let unlikeLinkElement = element.querySelector("#unDislikeLinkThumbUp");
+        let unlikeUrl = "/Review/UnThumbsDownReview?reviewGuid=@Model.ReviewGuid";//unlikeLinkElement.href;
+        let likeCounter = element.parentElement.querySelector("#dislikeCounterThumbDown");
+        fetch(`${unlikeUrl}`, {
+            credentials: "same-origin"
+        });
+        element.style.display = "none";
+        element.previousElementSibling.style.display = "inline";
+        likeCounter.innerHTML = Number(likeCounter.innerHTML) - 1;
+    }
+
+    //****************** For Review *****************
+    function getLikesListForReview(reviewGuid) {
+        fetch(`/Review/GetLikesListForReview?reviewGuid=${reviewGuid}`, {
+            credentials: "same-origin"
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then(usernames => {
+            //console.log(usernames);
+            let listItems = "";
+            for (let username of usernames) {
+                listItems +=
+                `<li><div class="chip">
+                <a href="/Identity/Profile/${username}">
+                    <img src="/Identity/UserImage?username=${username}" alt="User Image Profile">
+                    ${username}
+                </a></div></li>`;
+            }
+            let list = `<h3>Likes:</h3><ul>${listItems}</ul>`;
+            document.getElementById("list0a7a1ccb9b9440dca90e4bb277309424").innerHTML = list;
+            showModal_87e98a0689424e83853cd8461d6ec59f();
+        });
+    }
+
+    function getThumbsUpListForReview(reviewGuid) {
+        fetch(`/Review/GetThumbsUpListForReview?reviewGuid=${reviewGuid}`, {
+            credentials: "same-origin"
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then(usernames => {
+            let listItems = "";
+            for (let username of usernames) {
+                listItems +=
+                    `<li><div class="chip">
+                <a href="/Identity/Profile/${username}">
+                    <img src="/Identity/UserImage?username=${username}" alt="User Image Profile" width="96"
+                        height="96">
+                    ${username}
+                </a></div></li>`;
+            }
+            let list = `<h3>ThumbsUp:</h3><ul>${listItems}</ul>`;
+            document.getElementById("list0a7a1ccb9b9440dca90e4bb277309424").innerHTML = list;
+            showModal_87e98a0689424e83853cd8461d6ec59f();
+        });
+    }
+
+    function getThumbsDownListForReview(reviewGuid) {
+        fetch(`/Review/GetThumbsDownListForReview?reviewGuid=${reviewGuid}`, {
+            credentials: "same-origin"
+        }).then(resp => {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then(usernames => {
+            let listItems = "";
+            for (let username of usernames) {
+                listItems +=
+                    `<li><div class="chip">
+                <a href="/Identity/Profile/${username}">
+                    <img src="/Identity/UserImage?username=${username}" alt="User Image Profile" width="96"
+                        height="96">
+                    ${username}
+                </a></div></li>`;
+            }
+            let list = `<h3>ThumbsDown:</h3><ul>${listItems}</ul>`;
+            document.getElementById("list0a7a1ccb9b9440dca90e4bb277309424").innerHTML = list;
+            showModal_87e98a0689424e83853cd8461d6ec59f();
+        });
+    }
+
+    function pleaseLogin_4f2ac9abd82e4532aa2338762bf5d086() {
+        alert("Please login");
+    }
+</script>
+
+<!------------------------------------- modal ---------------------------------------->
+<div id="modal6d70ced7ba7446e3b2fb0501938671e9">
+    <style>
+        /* Add padding and center-align text to the container */
+        #modal6d70ced7ba7446e3b2fb0501938671e9 .container {
+            padding: 16px;
+            text-align: center;
+        }
+
+        /* The Modal (background) */
+        #modal6d70ced7ba7446e3b2fb0501938671e9 .modal {
+            display: block;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 2;
+            /* Sit on top */
+            left: 50%;
+            top: 50%;
+            width: 0;
+            /* Full width */
+            height: 0;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgba(60, 69, 88, 0.7);
+            padding-top: 0px;
+            transition: all 0.3s;
+        }
+
+        #modal6d70ced7ba7446e3b2fb0501938671e9 .modal.open {
+            /*display: block;*/
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Modal Content/Box */
+        #modal6d70ced7ba7446e3b2fb0501938671e9 .modal-content {
+            background-color: rgba(255, 255, 255, 1);
+            margin: 50px auto;
+            /*border: 1px solid #888;*/
+            width: fit-content;
+        }
+
+        /* The Modal Close Button (x) */
+        #modal6d70ced7ba7446e3b2fb0501938671e9 .close {
+            position: relative;
+            float: right;
+            right: 15px;
+            /*top: 15px;*/
+            font-size: 40px;
+            font-weight: bold;
+            color: #696969;
+            cursor: pointer;
+        }
+
+        #modal6d70ced7ba7446e3b2fb0501938671e9 .close:hover,
+        #modal6d70ced7ba7446e3b2fb0501938671e9 .close:focus {
+            color: red;
+        }
+    </style>
+
+    <div id="modal-background" class="modal">
+        <div class="modal-content" action="">
+            <span onclick="this.parentElement.parentElement.classList.remove('open');" class="close"
+                title="Close Modal">&times;</span>
+            <div class="container">
+                <style>
+                    #list0a7a1ccb9b9440dca90e4bb277309424 .modal-list {
+                        display: none;
+                    }
+
+                    #list0a7a1ccb9b9440dca90e4bb277309424 .modal-list.show {
+                        display: block;
+                    }
+
+                    #list0a7a1ccb9b9440dca90e4bb277309424 ul {
+                        list-style-type: none;
+                        /* Remove bullets */
+                        padding: 0;
+                        /* Remove padding */
+                        margin: 0 auto;
+                        /* Remove margins */
+                        /*max-width: 320px;*/
+                        max-height: calc(90vh - 20px);
+                        overflow-y: auto;
+                    }
+
+                    #list0a7a1ccb9b9440dca90e4bb277309424 ul li {
+                        border: 1px solid #ddd;
+                        /* Add a thin border to each list item */
+                        margin-top: -1px;
+                        /* Prevent double borders */
+                        background-color: #f6f6f6;
+                        /* Add a grey background color */
+                        padding: 12px;
+                        /* Add some padding */
+                        text-align: start;
+                    }
+
+                    /*********************************/
+                    #list0a7a1ccb9b9440dca90e4bb277309424 .chip {
+                        display: inline-block;
+                        padding: 0 25px;
+                        height: 50px;
+                        font-size: 16px;
+                        line-height: 50px;
+                        border-radius: 25px;
+                        background-color: #f1f1f1;
+                    }
+
+                    #list0a7a1ccb9b9440dca90e4bb277309424 .chip a {
+                        text-decoration: none;
+                        color: rgb(3, 3, 3);
+                    }
+
+                    #list0a7a1ccb9b9440dca90e4bb277309424 .chip img {
+                        float: left;
+                        margin: 0 10px 0 -25px;
+                        height: 50px;
+                        width: 50px;
+                        border-radius: 50%;
+                    }
+                </style>
+                <!--*********************************** Lists ***********************************-->
+                <div id="list0a7a1ccb9b9440dca90e4bb277309424">
+
+                </div>
+                <!--*************************************************************************************-->
+            </div>
+        </div>
+    </div>
+    <script>
+        // When the user clicks anywhere outside of the modal, close it
+        window.addEventListener("click", (event) => {
+            // Get the modal
+            let modal = document.getElementById('modal6d70ced7ba7446e3b2fb0501938671e9').querySelector("#modal-background");
+            if (event.target == modal) {
+                modal.classList.remove('open');
+                //hideAllModalList();
+            }
+        });
+        function showModal_87e98a0689424e83853cd8461d6ec59f() {
+            document.getElementById("modal6d70ced7ba7446e3b2fb0501938671e9")
+                .querySelector('#modal-background').classList.add('open');
+        }
+    </script>
+</div>

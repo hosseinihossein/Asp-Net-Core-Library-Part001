@@ -1,0 +1,252 @@
+@model Identity_UserModel
+
+<!------------------------------------------------------------------------->
+<style>
+    #card0046e27fa25f46bea614ad724cf5816a {
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        /*justify-items: center;*/
+        flex-direction: row;
+        flex-wrap: wrap;
+        /*max-width: 500px;*/
+        width: fit-content;
+        background-color: #f1f1f1;
+        box-shadow: 0px 5px 20px lightblue;
+        border: 1px solid #f1f1f1;
+        border-radius: 3px;
+        transition: border 0.3s;
+    }
+
+    #card0046e27fa25f46bea614ad724cf5816a:hover {
+        border: 1px solid lightgray;
+    }
+
+    #card0046e27fa25f46bea614ad724cf5816a>div {
+        background-color: #f1f1f1;
+        width: 100%;
+        margin: 5px;
+        text-align: start;
+    }
+
+    #card0046e27fa25f46bea614ad724cf5816a>div>img#profile-image {
+        max-width: 200px;
+    }
+
+    #card0046e27fa25f46bea614ad724cf5816a .edit-btn {
+        cursor: pointer;
+    }
+
+    /*button styling*/
+    #card0046e27fa25f46bea614ad724cf5816a .button78e8983584504867b61ee269c57909ec {
+        background-color: white;
+        border: 2px solid #555555;
+        color: black;
+        padding: 15px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        transition-duration: 0.3s;
+        -webkit-transition-duration: 0.3s;
+        /* Safari */
+        border-radius: 4px;
+    }
+
+    #card0046e27fa25f46bea614ad724cf5816a .button78e8983584504867b61ee269c57909ec:hover {
+        background-color: #555555;
+        color: white;
+    }
+</style>
+<div id="card0046e27fa25f46bea614ad724cf5816a">
+    <div style="position:relative;width:fit-content;/*margin:auto;*/">
+        <img id="profile-image" src="/Identity/UserImage?username=@Model.UserName&v=@Model.ProfileImageVersion"
+            alt="animal">
+        @if (User.Identity?.Name == Model.UserName)
+        {
+            <button class="edit-btn" style="position:absolute;right:5px;bottom:5px;"
+                onclick="showModal(document.getElementById('profileImageModal'));">
+                <i class="fa-regular fa-image"></i> Change
+            </button>
+        }
+    </div>
+    <div class="clearfix">
+        <h3 style="padding-left: 10px; margin: 0;float:left;">@Model.UserName</h3>
+        @if (User.Identity?.Name == Model.UserName)
+        {
+            <button class="edit-btn" style="font-size:14px;margin-left:5px;"
+                onclick="showModal(document.getElementById('usernameModal'));">
+                <i class="fa-solid fa-pen"></i> Edit
+            </button>
+        }
+    </div>
+    <div class="clearfix">
+        @if (Model.DisplayEmailPublicly || User.Identity?.Name == Model.UserName)
+        {
+            <p style="padding-left: 10px; font-size: large; color: gray; margin: 0;float:left;">
+                Email: @Model.Email
+            </p>
+        }
+        @if (User.Identity?.Name == Model.UserName)
+        {
+            <span style="font-size:12px;padding:5px;display:block;float:left;">
+                @if (Model.EmailConfirmed)
+                {
+                    @:Confirmed <i class="fa-solid fa-check" style="color: lawngreen;"></i>
+                }
+                else
+                {
+                    @:NotConfirmed <i class="fa-solid fa-xmark" style="red"></i>
+                }
+            </span>
+            <button class="edit-btn" style="font-size:14px;margin-left:5px;"
+                onclick="showModal(document.getElementById('emailModal'));">
+                <i class="fa-solid fa-pen"></i> Edit
+            </button>
+        }
+    </div>
+    @if (User.Identity?.Name == Model.UserName)
+    {
+        <div>
+            <p style="padding-left: 10px; margin: 0;font-size:14px;">
+                <i class="fa-solid fa-check"></i> Account is @(Model.Active ? "Active" : "Inactive")
+            </p>
+        </div>
+        <div>
+            <button class="button78e8983584504867b61ee269c57909ec" style="margin: 5px 10px;float:left;"
+                onclick="showModal(document.getElementById('passwordModal'));">
+                <i class="fa-solid fa-key"></i> Change Password
+            </button>
+            @if (!Model.EmailConfirmed)
+            {
+                <button class="button78e8983584504867b61ee269c57909ec" style="margin: 5px 10px;float:right;"
+                    onclick="showModal(document.getElementById('emailConfirmModal'));">
+                    <i class="fa-solid fa-envelope-circle-check"></i> Confirm Email
+                </button>
+            }
+        </div>
+
+        <!--------------------------------------------------------------------->
+        <style>
+            #card0046e27fa25f46bea614ad724cf5816a .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0);
+                backdrop-filter: blur(5px);
+                width: 100%;
+            }
+
+            #card0046e27fa25f46bea614ad724cf5816a .modal form {
+                width: fit-content;
+                margin: 100px auto;
+                background-color: white;
+                display: block;
+                padding: 20px;
+                border-radius: 10px;
+            }
+
+            #card0046e27fa25f46bea614ad724cf5816a .modal form input {
+                font-size: 16px;
+                padding: 5px 10px;
+                border-radius: 5px;
+                border: 1px solid gray;
+                width: 300px;
+            }
+
+            #card0046e27fa25f46bea614ad724cf5816a .modal form input[type=submit] {
+                cursor: pointer;
+            }
+
+            #card0046e27fa25f46bea614ad724cf5816a .modal form input[type=submit]:hover {
+                background-color: white;
+            }
+
+            #card0046e27fa25f46bea614ad724cf5816a .modal #close-btn {
+                font-size: 40px;
+                position: absolute;
+                top: 50px;
+                right: 50px;
+                cursor: pointer;
+            }
+
+            #card0046e27fa25f46bea614ad724cf5816a .modal #close-btn:hover {
+                color: red;
+            }
+        </style>
+        <div class="modal" id="usernameModal">
+            <span id="close-btn" onclick="hideModal(this.parentElement);">&times;</span>
+            <form asp-action="SubmitUsername">
+                <div>
+                    <label for="username">Username:</label>
+                    <input name="username" id="username" type="text" value="@Model.UserName">
+                </div>
+                <input type="submit" value="Submit" style="display:block;width:fit-content;margin: 20px auto;">
+            </form>
+        </div>
+        <div class="modal" id="passwordModal">
+            <span id="close-btn" onclick="hideModal(this.parentElement);">&times;</span>
+            <form asp-action="SubmitNewPassword">
+                <div class="clearfix" style="margin:10px;">
+                    <label for="currentPassword">Current Password:</label>
+                    <input name="currentPassword" id="currentPassword" type="text" value="" style="float:right;">
+                </div>
+                <div class="clearfix" style="margin:10px;">
+                    <label for="newPassword">New Password:</label>
+                    <input name="newPassword" id="newPassword" type="text" value="" style="float:right;">
+                </div>
+                <div class="clearfix" style="margin:10px;">
+                    <label for="repeatNewPassword">Repeat New Password:</label>
+                    <input name="repeatNewPassword" id="repeatNewPassword" type="text" value="" style="float:right;">
+                </div>
+                <input type="submit" value="Submit" style="display:block;width:fit-content;margin: 20px auto;">
+            </form>
+        </div>
+        <div class="modal" id="emailModal">
+            <span id="close-btn" onclick="hideModal(this.parentElement);">&times;</span>
+            <form asp-action="SubmitNewEmail">
+                <div>
+                    <label for="email">Email:</label>
+                    <input name="email" id="email" type="text" value="@Model.Email">
+                </div>
+                <input type="submit" value="Submit" style="display:block;width:fit-content;margin: 20px auto;">
+            </form>
+        </div>
+        <div class="modal" id="emailConfirmModal">
+            <span id="close-btn" onclick="hideModal(this.parentElement);">&times;</span>
+            <form asp-action="ConfirmEmail">
+                <div>
+                    <label for="emailCode">Email Confirmation Code:</label>
+                    <input name="evc" id="emailCode" type="text" value="">
+                </div>
+                <input type="submit" value="Submit" style="display:block;width:fit-content;margin: 20px auto;">
+            </form>
+        </div>
+        <div class="modal" id="profileImageModal">
+            <span id="close-btn" onclick="hideModal(this.parentElement);">&times;</span>
+            <form asp-action="SubmitProfileImage" method="post" enctype="multipart/form-data">
+                <div>
+                    <label for="imgFile">Select image:</label>
+                    <input name="imgFile" id="imgFile" type="file" value="" style="border:none;">
+                </div>
+                <input type="submit" value="Submit" style="display:block;width:fit-content;margin: 20px auto;">
+            </form>
+        </div>
+
+        <script>
+            function showModal(modalDiv) {
+                modalDiv.style.display = "block";
+            }
+            function hideModal(modalDiv) {
+                modalDiv.style.display = "none";
+            }
+
+        </script>
+    }
+</div>

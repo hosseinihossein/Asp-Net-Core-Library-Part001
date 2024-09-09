@@ -1,0 +1,75 @@
+@{
+    ViewBag.CurrentPage = ViewBag.CurrentPage ?? 1;
+    ViewBag.LastPage = ViewBag.LastPage ?? 1;
+}
+<!----------------------------------------------------------------->
+
+<style>
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb {
+        display: block;
+        width: fit-content;
+        margin: 50px auto;
+        border: 1px solid lightgray;
+    }
+
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb a {
+        color: black;
+        float: left;
+        padding: 8px 12px;
+        margin: 2px;
+        text-decoration: none;
+        border-radius: 5px;
+        min-width: 40px;
+        text-align: center;
+        font-size: 16px;
+    }
+
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb a#active {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb a.deactive {
+        cursor: default;
+    }
+
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb a:hover:not(#active):not(.deactive) {
+        background-color: #ddd;
+    }
+
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb form {
+        float: left;
+        background-color: lightgray;
+    }
+
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb form input,
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb form label {
+        float: left;
+        font-size: 16px;
+        padding: 8px 12px;
+        margin: 2px;
+    }
+
+    #paginatione6f6ceeec5f74afe96e4fc15a16000bb form input {
+        padding: 6px 12px;
+        width: 100px;
+    }
+</style>
+<div id="paginatione6f6ceeec5f74afe96e4fc15a16000bb" class="clearfix">
+    @if (ViewBag.CurrentPage > 1)
+    {
+        <a id="previous" asp-route-page="@(ViewBag.CurrentPage - 1)">«</a>
+    }
+    <a id="first" asp-route-page="1">1</a>
+    <form asp-action="Index" method="get">
+        <label for="current-page">Page:</label>
+        <input type="number" min="1" max="@ViewBag.LastPage" name="page" id="current-page" value="@ViewBag.CurrentPage"
+            onkeypress="if(event.key == 'Enter')this.parentElement.submit();">
+        <input hidden value="@Context.Request.Query["category"].ToString()" name="category">
+    </form>
+    <a id="last" asp-route-page="@ViewBag.LastPage">@ViewBag.LastPage</a>
+    @if (ViewBag.LastPage > ViewBag.CurrentPage)
+    {
+        <a id="next" asp-route-page="@(ViewBag.CurrentPage + 1)">»</a>
+    }
+</div>

@@ -1,0 +1,10 @@
+================== based on ===================
+Review
+
+=================== Nuget Packages ==================
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.Tools
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.AspNetCore.Identity.EntityFrameworkCore
+MailKit

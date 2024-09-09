@@ -1,0 +1,99 @@
+@model Inventory_FormModel
+
+<!---------------------------------------------------->
+<style>
+    #forma520841a765e47a8baf273cf8675b3a4 {
+        width: 60%;
+        margin: auto;
+    }
+
+    /* Style the form element with a border around it */
+    #forma520841a765e47a8baf273cf8675b3a4 form {
+        border: 4px solid #f1f1f1;
+    }
+
+    /* Add some padding and a grey background color to containers */
+    #forma520841a765e47a8baf273cf8675b3a4 .container {
+        padding: 20px;
+        background-color: #f1f1f1;
+    }
+
+    #forma520841a765e47a8baf273cf8675b3a4 .container .input-div {
+        margin: 10px 0;
+    }
+
+    /* Style the input elements and the submit button */
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=text],
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=submit],
+    #forma520841a765e47a8baf273cf8675b3a4 select,
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=file] {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    /* Add margins to the checkbox */
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=checkbox] {
+        margin-top: 16px;
+        transform: scale(150%);
+    }
+
+    /* Style the submit button */
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=submit] {
+        background-color: #04AA6D;
+        color: white;
+        border: none;
+    }
+
+    #forma520841a765e47a8baf273cf8675b3a4 input[type=submit]:hover {
+        opacity: 0.8;
+    }
+
+    @@media screen and (max-width:800px) {
+        #forma520841a765e47a8baf273cf8675b3a4 {
+            width: 100%;
+        }
+    }
+</style>
+
+<div id="forma520841a765e47a8baf273cf8675b3a4">
+    <form asp-action="SubmitNewItem" method="post" enctype="multipart/form-data">
+        <div class="container">
+            <h2 style="text-align: center;">Adding New Item</h2>
+        </div>
+        <div asp-validation-summary="All" style="color: red;"></div>
+        <div class="container" style="background-color:white">
+            <div class="input-div">
+                <label asp-for="Name">Name:</label>
+                <input type="text" placeholder="Item Name.." asp-for="Name">
+            </div>
+            <div class="input-div">
+                <label asp-for="Category">Category:</label>
+                <select asp-for="Category" id="Category">
+                    <option value="category1">category1</option>
+                    <option value="category2">category2</option>
+                    <option value="category3">category3</option>
+                    <option value="category4">category4</option>
+                </select>
+            </div>
+            <div class="input-div">
+                <label asp-for="Description">Description:</label>
+                <input type="text" placeholder="Description.." asp-for="Description">
+            </div>
+            <div class="input-div">
+                <label asp-for="ImageFile">Select an image for the item:</label>
+                <input type="file" placeholder="Description.." asp-for="ImageFile">
+            </div>
+        </div>
+
+        <div class="container">
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+</div>
+
+<!---------------------------------------------------->
