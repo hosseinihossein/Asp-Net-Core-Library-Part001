@@ -1,4 +1,6 @@
-bin/
-obj/
-.vscode/
+*/bin/
+*/obj/
+*/.vscode/
 */todo.txt
+*/wwwroot/Files/
+*/wwwroot/Images/Files/
