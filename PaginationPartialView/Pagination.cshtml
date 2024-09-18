@@ -1,6 +1,7 @@
 @{
     ViewBag.CurrentPage = ViewBag.CurrentPage ?? 1;
-    ViewBag.LastPage = ViewBag.LastPage ?? 1;
+    ViewBag.LastPage = ViewBag.LastPage is null || ViewBag.LastPage == 0 ? 1 : ViewBag.LastPage;
+    ViewBag.Action = ViewBag.Action ?? "Index";
 }
 <!----------------------------------------------------------------->
 
@@ -58,18 +59,21 @@
 <div id="paginatione6f6ceeec5f74afe96e4fc15a16000bb" class="clearfix">
     @if (ViewBag.CurrentPage > 1)
     {
-        <a id="previous" asp-route-page="@(ViewBag.CurrentPage - 1)">«</a>
+        <a id="previous" asp-route-page="@(ViewBag.CurrentPage - 1)"
+            asp-route-category="@Context.Request.Query["category"].ToString()">«</a>
     }
-    <a id="first" asp-route-page="1">1</a>
-    <form asp-action="Index" method="get">
+    <a id="first" asp-route-page="1" asp-route-category="@Context.Request.Query["category"].ToString()">1</a>
+    <form asp-action="@ViewBag.Action" method="get">
         <label for="current-page">Page:</label>
         <input type="number" min="1" max="@ViewBag.LastPage" name="page" id="current-page" value="@ViewBag.CurrentPage"
             onkeypress="if(event.key == 'Enter')this.parentElement.submit();">
         <input hidden value="@Context.Request.Query["category"].ToString()" name="category">
     </form>
-    <a id="last" asp-route-page="@ViewBag.LastPage">@ViewBag.LastPage</a>
+    <a id="last" asp-route-page="@ViewBag.LastPage"
+        asp-route-category="@Context.Request.Query["category"].ToString()">@ViewBag.LastPage</a>
     @if (ViewBag.LastPage > ViewBag.CurrentPage)
     {
-        <a id="next" asp-route-page="@(ViewBag.CurrentPage + 1)">»</a>
+        <a id="next" asp-route-page="@(ViewBag.CurrentPage + 1)"
+            asp-route-category="@Context.Request.Query["category"].ToString()">»</a>
     }
 </div>
