@@ -70,9 +70,6 @@ public class HomeController : Controller
 
         // Accumulate the form data key-value pairs in the request (formAccumulator).
         var formAccumulator = new KeyValueAccumulator();
-        /*var trustedFileNameForDisplay = string.Empty;
-        var untrustedFileNameForStorage = string.Empty;
-        var streamedFileContent = Array.Empty<byte>();*/
 
         var boundary = HeaderUtilities.RemoveQuotes(mediaTypeHeader.Boundary).Value;
         if (string.IsNullOrWhiteSpace(boundary))
@@ -92,89 +89,107 @@ public class HomeController : Controller
         string? uploadedFileName = null;
         string? uploadedFileImageName = null;
         string fileGuid = Guid.NewGuid().ToString().Replace("-", "");
-
-        while (section != null)
+        //file temp path
+        string? fileTempPath = null;
+        string? imageFileTempPath = null;
+        //temp dirInfo
+        var tempFilesDirInfo = Directory.CreateDirectory($"{env.ContentRootPath}{ds}TempFiles{ds}Files{ds}{fileGuid}");
+        var tempImagesDirInfo = Directory.CreateDirectory($"{env.ContentRootPath}{ds}TempFiles{ds}Images");
+        try
         {
-            var hasContentDispositionHeader =
-                ContentDispositionHeaderValue.TryParse(
-                    section.ContentDisposition, out var contentDisposition);
-
-            if (hasContentDispositionHeader)
+            while (section != null)
             {
-                var fileDirInfo = Directory.CreateDirectory(Path.Combine(env.WebRootPath, "Files", fileGuid));
-                if (contentDisposition != null
-                    && contentDisposition.DispositionType.Equals("form-data")
-                    && (!string.IsNullOrEmpty(contentDisposition.FileName.Value)
-                        || !string.IsNullOrEmpty(contentDisposition.FileNameStar.Value)))
+                var hasContentDispositionHeader =
+                    ContentDispositionHeaderValue.TryParse(
+                        section.ContentDisposition, out var contentDisposition);
+
+                if (hasContentDispositionHeader)
                 {
-                    var fileName = WebUtility.HtmlEncode(contentDisposition.FileName.Value);
-                    fileName ??= "fileName";
-                    var key = HeaderUtilities.RemoveQuotes(contentDisposition.Name).Value;
-                    string? saveToPath = null;
-
-                    if (key == "File")
-                    {
-                        uploadedFileName = fileName;
-                        saveToPath = Path.Combine(fileDirInfo.FullName, fileName);
-                    }
-                    if (key == "FileImage")
-                    {
-                        uploadedFileImageName = fileName;
-                        saveToPath = $"{env.WebRootPath}{ds}Images{ds}Files{ds}{fileGuid}";
-                    }
-
-                    if (saveToPath is null)
-                    {
-                        ModelState.AddModelError("saveToPath",
-                        "saveToPath is null (Error 6).");
-                        // Log error
-
-                        return BadRequest(ModelState);
-                    }
-
-                    using (var fs = System.IO.File.Create(saveToPath))
-                    {
-                        await section.Body.CopyToAsync(fs);
-                    }
-                }
-                else if (contentDisposition != null
+                    //var fileDirInfo = Directory.CreateDirectory(Path.Combine(env.WebRootPath, "Files", fileGuid));
+                    if (contentDisposition != null
                         && contentDisposition.DispositionType.Equals("form-data")
-                        && string.IsNullOrEmpty(contentDisposition.FileName.Value)
-                        && string.IsNullOrEmpty(contentDisposition.FileNameStar.Value))
-                {
-                    // Don't limit the key name length because the 
-                    // multipart headers length limit is already in effect.
-                    var key = HeaderUtilities
-                        .RemoveQuotes(contentDisposition.Name).Value;
-
-                    var hasMediaTypeHeader =
-                    MediaTypeHeaderValue.TryParse(section.ContentType, out var mediaType);
-
-                    using (var streamReader = new StreamReader(
-                        section.Body,
-                        mediaType?.Encoding ?? Encoding.UTF8,
-                        detectEncodingFromByteOrderMarks: true,
-                        bufferSize: 1024,
-                        leaveOpen: true))
+                        && (!string.IsNullOrEmpty(contentDisposition.FileName.Value)
+                            || !string.IsNullOrEmpty(contentDisposition.FileNameStar.Value)))
                     {
-                        // The value length limit is enforced by 
-                        // MultipartBodyLengthLimit
-                        var value = await streamReader.ReadToEndAsync();
+                        var fileName = WebUtility.HtmlEncode(contentDisposition.FileName.Value);
+                        fileName ??= "fileName";
+                        var key = HeaderUtilities.RemoveQuotes(contentDisposition.Name).Value;
+                        string? saveToPath = null;
 
-                        if (string.Equals(value, "undefined",
-                            StringComparison.OrdinalIgnoreCase))
+                        if (key == "File")
                         {
-                            value = string.Empty;
+                            uploadedFileName = fileName;
+                            saveToPath = Path.Combine(tempFilesDirInfo.FullName, fileName);
+                            fileTempPath = saveToPath;
+                        }
+                        if (key == "FileImage")
+                        {
+                            uploadedFileImageName = fileName;
+                            saveToPath = //$"{env.WebRootPath}{ds}Images{ds}Files{ds}{fileGuid}";
+                            Path.Combine(tempImagesDirInfo.FullName, fileGuid);
+                            imageFileTempPath = saveToPath;
                         }
 
-                        formAccumulator.Append(key!, value);
+                        if (saveToPath is null)
+                        {
+                            ModelState.AddModelError("saveToPath",
+                            "saveToPath is null (Error 6).");
+                            // Log error
+
+                            return BadRequest(ModelState);
+                        }
+
+                        using (var fs = System.IO.File.Create(saveToPath))
+                        {
+                            await section.Body.CopyToAsync(fs);
+                        }
+                    }
+                    else if (contentDisposition != null
+                            && contentDisposition.DispositionType.Equals("form-data")
+                            && string.IsNullOrEmpty(contentDisposition.FileName.Value)
+                            && string.IsNullOrEmpty(contentDisposition.FileNameStar.Value))
+                    {
+                        // Don't limit the key name length because the 
+                        // multipart headers length limit is already in effect.
+                        var key = HeaderUtilities
+                            .RemoveQuotes(contentDisposition.Name).Value;
+
+                        var hasMediaTypeHeader =
+                        MediaTypeHeaderValue.TryParse(section.ContentType, out var mediaType);
+
+                        using (var streamReader = new StreamReader(
+                            section.Body,
+                            mediaType?.Encoding ?? Encoding.UTF8,
+                            detectEncodingFromByteOrderMarks: true,
+                            bufferSize: 1024,
+                            leaveOpen: true))
+                        {
+                            // The value length limit is enforced by 
+                            // MultipartBodyLengthLimit
+                            var value = await streamReader.ReadToEndAsync();
+
+                            if (string.Equals(value, "undefined",
+                                StringComparison.OrdinalIgnoreCase))
+                            {
+                                value = string.Empty;
+                            }
+
+                            formAccumulator.Append(key!, value);
+                        }
                     }
                 }
-            }
 
-            // Drain any remaining section body that hasn't been consumed and
-            // read the headers for the next section.
-            section = await reader.ReadNextSectionAsync();
+                // Drain any remaining section body that hasn't been consumed and
+                // read the headers for the next section.
+                section = await reader.ReadNextSectionAsync();
+            }
+        }
+        catch (Exception e)
+        {
+            string logDirectoryPath = $"{env.ContentRootPath}{ds}Logs";
+            var logDirInfo = Directory.CreateDirectory(logDirectoryPath);
+            string logPath = $"{logDirectoryPath}{ds}SubmitLargeFormFile_{Guid.NewGuid().ToString().Replace("-", "")}";
+            await System.IO.File.WriteAllTextAsync(logPath, e.ToString());
         }
 
         // Bind form data to the model
@@ -198,8 +213,20 @@ public class HomeController : Controller
         }
 
         string fileImagePath = $"{env.WebRootPath}{ds}Images{ds}Files{ds}{fileGuid}";
+        Directory.CreateDirectory($"{env.WebRootPath}{ds}Files{ds}{fileGuid}");
         string largeFilePath = Path.Combine(env.WebRootPath, "Files", fileGuid, uploadedFileName ?? string.Empty);
 
+        if (fileTempPath is not null && System.IO.File.Exists(fileTempPath))
+        {
+            System.IO.File.Move(fileTempPath, largeFilePath);
+            tempFilesDirInfo.Delete(true);
+        }
+        if (imageFileTempPath is not null && System.IO.File.Exists(imageFileTempPath))
+        {
+            System.IO.File.Move(imageFileTempPath, fileImagePath);
+        }
+
+        //****** get and show information about uploaded form and files ******
         FileInfo? largeFileInfo = null;
         if (System.IO.File.Exists(largeFilePath))
         {

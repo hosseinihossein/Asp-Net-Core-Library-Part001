@@ -121,7 +121,7 @@
 
             request.open("post", oFormElement.action);
             request.setRequestHeader("RequestVerificationToken", getCookie('RequestVerificationToken'));
-            request.timeout = 30000;//30seconds
+            //request.timeout = 30000;//30seconds
             request.send(formData);
 
             document.getElementById("modal1213276e57b2420cb55e23702f8e24da").style.display = "block";
