@@ -417,7 +417,8 @@
                         }
                     </td>
                     <td>
-                        <a asp-action="EditUser" asp-route-userGuid="@userListModel.User.UserGuid">Edit</a>
+                        <a asp-controller="Identity" asp-action="EditUser"
+                            asp-route-userGuid="@userListModel.User.UserGuid">Edit</a>
                     </td>
                 </tr>
             }
