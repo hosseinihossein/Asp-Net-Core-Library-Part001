@@ -13,10 +13,16 @@ namespace Review.Models
 
     public class EmailSender : IEmailSender
     {
+        IConfiguration configuration;
+        public EmailSender(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         public async Task SendEmailAsync(string receiverUserName, string receiverEmail, string subject, string message)
         {
-            string senderEmail = "ahsgfdajhsgt@gmail.com";
-            string senderGmailPassword = "wnmwahawpaexytmh";
+            string? senderEmail = configuration["EmailSender:Address"];//save the email sender address in the appsettings.Development.json
+            string? senderGmailPassword = configuration["EmailSender:SenderGmailPassword"];//save the sender gmail password in the appsettings.Development.json
             string senderName = "Admin";
 
             MimeMessage email = new MimeMessage();
