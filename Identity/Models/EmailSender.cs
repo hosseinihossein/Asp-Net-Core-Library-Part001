@@ -13,10 +13,16 @@ namespace Identity.Models
 
     public class EmailSender : IEmailSender
     {
+        IConfiguration configuration;
+        public EmailSender(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
+
         public async Task SendEmailAsync(string receiverUserName, string receiverEmail, string subject, string message)
         {
-            string senderEmail = "ahsgfdajhsgt@gmail.com";
-            string senderGmailPassword = "wnmwahawpaexytmh";
+            string? senderEmail = configuration["EmailSender:Address"];//"ahsgfdajhsgt@gmail.com";
+            string? senderGmailPassword = configuration["EmailSender:SenderGmailPassword"];//"wnmwahawpaexytmh";
             string senderName = "Admin";
 
             MimeMessage email = new MimeMessage();

@@ -1,4 +1,5 @@
 using Identity.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +29,7 @@ public class Program
         //****************************** Services *****************************
         builder.Services.AddControllersWithViews();
         builder.Services.AddTransient<IEmailSender, EmailSender>();
-	builder.Services.Configure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, opts =>
+        builder.Services.Configure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, opts =>
         {
             opts.AccessDeniedPath = "/Identity/AccessDenied";
             opts.LoginPath = "/Identity/Login";
@@ -55,9 +56,10 @@ public class Program
         identity_DbContext.Database.Migrate();
         UserManager<Identity_UserModel> userManager = app.Services.CreateScope().ServiceProvider.GetRequiredService<UserManager<Identity_UserModel>>();
         RoleManager<Identity_RoleModel> roleManager = app.Services.CreateScope().ServiceProvider.GetRequiredService<RoleManager<Identity_RoleModel>>();
-        if (await userManager.FindByNameAsync("admin") == null)
+        Identity_UserModel? admin = await userManager.FindByNameAsync("admin");
+        if (admin == null)
         {
-            Identity_UserModel user = new Identity_UserModel
+            admin = new Identity_UserModel
             {
                 UserName = "admin",
                 Email = "admin@MyCompany.com",
@@ -65,17 +67,20 @@ public class Program
                 UserGuid = "admin",
                 PasswordLiteral = "P@ssw0rd"
             };
-            IdentityResult result = await userManager.CreateAsync(user, user.PasswordLiteral);
-
-            if (await roleManager.FindByNameAsync("Identity_Admins") == null)
+            IdentityResult result = await userManager.CreateAsync(admin, admin.PasswordLiteral);
+            if (!result.Succeeded)
             {
-                await roleManager.CreateAsync(new Identity_RoleModel("Identity_Admins") { Description = "Top admins of the Identity service." });
+                foreach (var error in result.Errors)
+                {
+                    Console.WriteLine(error.Description);
+                }
+                return;
             }
-
-            if (result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(user, "Identity_Admins");
-            }
+        }
+        if (await roleManager.FindByNameAsync("Identity_Admins") == null)
+        {
+            await roleManager.CreateAsync(new Identity_RoleModel("Identity_Admins") { Description = "Admins of the Identity service." });
+            await userManager.AddToRoleAsync(admin, "Identity_Admins");
         }
 
 
