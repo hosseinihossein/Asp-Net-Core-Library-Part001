@@ -152,7 +152,6 @@ public class IdentityController : Controller
                 _ = emailSender.SendEmailAsync(signupModel.Username, signupModel.Email,
                 "Email Validation", emailMessage);
 
-
                 //**************** sign in the user **********************
                 await signInManager.PasswordSignInAsync(user, signupModel.Password, false, false);
 
