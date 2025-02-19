@@ -21,6 +21,7 @@ public class Program
         {
             options.User.RequireUniqueEmail = true;
             options.Tokens.EmailConfirmationTokenProvider = "emailTokenProvider";
+            options.Tokens.PasswordResetTokenProvider = "emailTokenProvider";
         })
         .AddTokenProvider<Identity_EmailTokenProvider>("emailTokenProvider")
         .AddEntityFrameworkStores<Identity_DbContext>();

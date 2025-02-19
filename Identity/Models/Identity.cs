@@ -58,6 +58,7 @@ public class Identity_SignupModel
     public string RepeatPassword { get; set; } = string.Empty;
 }
 
+
 //********************* administration ********************
 public class Identity_UserAndRolesModel(Identity_UserModel user, List<string> roles)
 {
@@ -117,7 +118,6 @@ public class Identity_EmailTokenProvider : AuthenticatorTokenProvider<Identity_U
     }
     public override async Task<string> GenerateAsync(string purpose, UserManager<Identity_UserModel> userManager, Identity_UserModel user)
     {
-        //string token = string.Empty;
         string code = new Random().Next(1000, 99999).ToString();
         user.EmailValidationCode = code;
         user.EmailValidationDate = DateTime.Now;

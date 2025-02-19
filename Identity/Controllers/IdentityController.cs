@@ -141,7 +141,7 @@ public class IdentityController : Controller
             if (result.Succeeded)
             {
                 await userManager.SetTwoFactorEnabledAsync(user, true);
-                //***** Create Email DB *****
+                //***** Generate Email verification code *****
                 string validationCode = await userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 //***** Sending Email *****
@@ -283,7 +283,7 @@ public class IdentityController : Controller
     }
 
     [Authorize]
-    public async Task<IActionResult> SubmitNewPassword(string currentPassword, string newPassword,
+    public async Task<IActionResult> ChangeCurrentPassword(string currentPassword, string newPassword,
     string repeatNewPassword)
     {
         Identity_UserModel? user = await userManager.FindByNameAsync(User.Identity!.Name!);
@@ -317,6 +317,68 @@ public class IdentityController : Controller
         object o = "There's a problem in changing username!";
         ViewBag.ResultState = "danger";
         return View("Result", o);
+    }
+
+    public IActionResult ForgetPassword()
+    {
+        return View();
+    }
+
+    public async Task<IActionResult> SubmitForgetPassword(string email)
+    {
+        Identity_UserModel? user = await userManager.FindByEmailAsync(email);
+        if (user is not null && user.Email is not null)
+        {
+            //***** Generate Email verification code *****
+            string validationCode = await userManager.GeneratePasswordResetTokenAsync(user);//.GenerateEmailConfirmationTokenAsync(user);
+
+            //***** Sending Email *****
+            string emailMessage = $"<h4>Hi dear {user.UserName}</h4>" +
+            $"<h4>Your Validation Code: {validationCode}</h4>" +
+            "<p>The validation code expires in 10 minutes.</p>";
+            await emailSender.SendEmailAsync(user.UserName ?? "Dear Client", user.Email,
+            "Email Validation", emailMessage);
+        }
+        return View("ChangeForgottenPassword", email);
+    }
+
+    /*public async Task<IActionResult> ChangeForgottenPassword(string email)
+    {
+        return View("ChangeForgottenPassword", email);
+    }*/
+
+    public async Task<IActionResult> ResetForgottenPassword(string email, string verificationCode,
+    string newPassword, string repeatPassword)
+    {
+        Identity_UserModel? user = await userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            ModelState.AddModelError("", "Invalid!");
+            return View("ChangeForgottenPassword", email);
+        }
+
+        if (newPassword != repeatPassword)
+        {
+            ModelState.AddModelError("", $"New Password=({newPassword}) and Repeat Password=({repeatPassword}) doesn't match!");
+            return View("ChangeForgottenPassword", email);
+        }
+
+        IdentityResult result = await userManager.ResetPasswordAsync(user, verificationCode, newPassword);
+        if (result.Succeeded)
+        {
+            user.PasswordLiteral = newPassword;
+            await userManager.UpdateAsync(user);
+
+            object o = $"The Password for Email \'{email}\' gets reset successfully!";
+            ViewBag.ResultState = "success";
+            return View("Result", o);
+        }
+
+        foreach (IdentityError error in result.Errors)
+        {
+            ModelState.AddModelError("", error.Description);
+        }
+        return View("ChangeForgottenPassword", email);
     }
 
     [Authorize]
