@@ -337,7 +337,7 @@ public class IdentityController : Controller
             $"<h4>Your Validation Code: {validationCode}</h4>" +
             "<p>The validation code expires in 10 minutes.</p>";
             await emailSender.SendEmailAsync(user.UserName ?? "Dear Client", user.Email,
-            "Email Validation", emailMessage);
+            "Reset Password", emailMessage);
         }
         return View("ChangeForgottenPassword", email);
     }
@@ -411,6 +411,7 @@ public class IdentityController : Controller
 
     [Authorize]
     [HttpPost]
+    [RequestSizeLimit(1024 * 100)]
     public async Task<IActionResult> SubmitProfileImage(IFormFile imgFile)
     {
         Identity_UserModel? user = await userManager.FindByNameAsync(User.Identity!.Name!);
@@ -441,6 +442,36 @@ public class IdentityController : Controller
         }
 
         return RedirectToAction(nameof(Dashboard));
+    }
+
+    [Authorize]
+    public async Task<IActionResult> AskAccountDeletion(string password)
+    {
+        Identity_UserModel? user = await userManager.FindByNameAsync(User.Identity!.Name!);
+        if (user is null)
+        {
+            object o1 = "user not found!";
+            ViewBag.ResultState = "danger";
+            return View("Result", o1);
+        }
+
+        if (password != user.PasswordLiteral)
+        {
+            object o1 = "Password Incorrect!";
+            ViewBag.ResultState = "danger";
+            return View("Result", o1);
+        }
+
+        //***** Sending Email *****
+        string emailMessage = $"<h4>Hi dear {user.UserName}</h4>" +
+        //$"<h4>Account Deletion Request</h4>" +
+        "<p>We have got a request to delete your account. It will take several days to be done.</p>";
+        await emailSender.SendEmailAsync(user.UserName ?? "Dear Client", user.Email!,
+        "Account Deletion", emailMessage);
+
+        object o = "Your request for account deletion has been submited successfully! It may take several days to be done.";
+        ViewBag.ResultState = "info";
+        return View("Result", o);
     }
 
     public async Task<IActionResult> UserImage(string username)

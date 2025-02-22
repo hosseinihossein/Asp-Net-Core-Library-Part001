@@ -60,6 +60,15 @@
         background-color: #555555;
         color: white;
     }
+
+    #card0046e27fa25f46bea614ad724cf5816a .button78e8983584504867b61ee269c57909ec.deleteAcc {
+        color: red;
+    }
+
+    #card0046e27fa25f46bea614ad724cf5816a .button78e8983584504867b61ee269c57909ec.deleteAcc:hover {
+        background-color: red;
+        color: white;
+    }
 </style>
 <div id="card0046e27fa25f46bea614ad724cf5816a">
     <div style="position:relative;width:fit-content;/*margin:auto;*/">
@@ -122,14 +131,19 @@
             </button>
             @if (!Model.EmailConfirmed)
             {
-                <button class="button78e8983584504867b61ee269c57909ec" style="margin: 5px 10px;float:right;"
+                <button class="button78e8983584504867b61ee269c57909ec" style="margin: 5px 10px;float:left;"
                     onclick="showModal(document.getElementById('emailConfirmModal'));">
                     <i class="fa-solid fa-envelope-circle-check"></i> Confirm Email
                 </button>
             }
+
+            <button class="button78e8983584504867b61ee269c57909ec deleteAcc" style="margin: 5px 10px;float:right;"
+                onclick="showModal(document.getElementById('deleteAccountModal'));">
+                <i class="fa-solid fa-user-xmark"></i> Delete Account
+            </button>
         </div>
 
-        <!--------------------------------------------------------------------->
+        <!----------------------------------- modals ---------------------------------->
         <style>
             #card0046e27fa25f46bea614ad724cf5816a .modal {
                 display: none;
@@ -238,10 +252,37 @@
             <form asp-action="SubmitProfileImage" method="post" enctype="multipart/form-data">
                 <div>
                     <label for="imgFile">Select image:</label>
-                    <input name="imgFile" id="imgFile" type="file" value="" style="border:none;">
+                    <input required name="imgFile" id="imgFile" type="file" value="" style="border:none;"
+                        oninput="checkImage(this, event)">
                 </div>
-                <input type="submit" value="Submit" style="display:block;width:fit-content;margin: 20px auto;">
+                <input type="submit" value="Submit" style="display:none;width:fit-content;margin: 20px auto;">
             </form>
+            <script>
+                function checkImage(inputElement, event) {
+                    if (event.target.files[0]) {
+                        if (event.target.files[0].size > 100 * 1024) {
+                            alert("Profile image can't be more than 100 KB");
+                        }
+                        else {
+                            inputElement.parentElement.nextElementSibling.style.display = 'block';
+                        }
+                    }
+                }
+            </script>
+        </div>
+
+        <div class="modal" id="deleteAccountModal">
+            <span id="close-btn" onclick="hideModal(this.parentElement);">&times;</span>
+            <div style="text-align:center;margin-top:100px;" class="clearfix">
+                <p>Are you sure you want to delete your account?</p>
+                <form asp-action="AskAccountDeletion" method="get">
+                    <div>
+                        <label for="passwordForAccDelete">Enter password to confirm:</label>
+                        <input required name="password" id="passwordForAccDelete" type="text" value="">
+                    </div>
+                    <input type="submit" value="Yes, Delete" style="display:block;width:fit-content;margin: 20px auto;">
+                </form>
+            </div>
         </div>
 
         <script>

@@ -59,7 +59,9 @@
         <div class="container">
             <h2 style="text-align: center;">Login Form</h2>
         </div>
-        <div asp-validation-summary="All" style="color: red;"></div>
+        <div asp-validation-summary="All" style="color: red;">
+            <p>error01: blah blah blah</p>
+        </div>
         <input type="hidden" asp-for="ReturnUrl">
         <div class="container" style="background-color:white">
             <input type="text" placeholder="Username or Email" asp-for="UsernameOrEmail">
